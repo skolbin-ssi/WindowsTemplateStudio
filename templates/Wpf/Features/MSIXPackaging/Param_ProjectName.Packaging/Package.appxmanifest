@@ -10,7 +10,7 @@
   <Identity
     Name="07ad151b-a614-4a13-aef0-5378d3f98e67"
     Publisher="CN=Param_UserName"
-    Version="1.0.5.0" />
+    Version="1.0.0.0" />
 
   <Properties>
     <DisplayName>Param_ProjectName.Packaging</DisplayName>
@@ -32,8 +32,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="Param_ProjectName.Packaging"
-        Description="Param_ProjectName.Packaging"
+        DisplayName="ms-resource:AppDisplayName"
+        Description="ms-resource:AppDescription"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">

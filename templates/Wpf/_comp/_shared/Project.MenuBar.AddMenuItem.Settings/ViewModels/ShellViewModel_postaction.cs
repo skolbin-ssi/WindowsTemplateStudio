@@ -1,6 +1,6 @@
 ﻿namespace Param_RootNamespace.ViewModels
 {
-    public class ShellViewModel : System.ComponentModel.INotifyPropertyChanged, IDisposable
+    public class ShellViewModel : System.ComponentModel.INotifyPropertyChanged
     {
         private readonly INavigationService _navigationService;
 //{[{
@@ -10,7 +10,7 @@
 //{[{
         private ICommand _menuFilewts.ItemNameCommand;
 //}]}
-
+        private ICommand _loadedCommand;
         public System.Windows.Input.ICommand GoBackCommand => _goBackCommand ?? (_goBackCommand = new System.Windows.Input.ICommand(OnGoBack, CanGoBack));
 //{[{
 

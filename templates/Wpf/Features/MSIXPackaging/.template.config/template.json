@@ -20,14 +20,16 @@
     "wts.genGroup": "0",
     "wts.group": "Packaging",
     "wts.displayOrder": "1",
-    "wts.defaultInstance": "MultiView",
+    "wts.defaultInstance": "MSIX Packaging",
     "wts.multipleInstance": "false",
-    "wts.rightClickEnabled": "true",
-    "wts.outputToParent": "true"
+    "wts.rightClickEnabled": "false",
+    "wts.outputToParent": "true",
+    "wts.requiredSdks":"UAP, Version=10.0.19041.0",
+    "wts.requiredVsWorkload": "Microsoft.VisualStudio.ComponentGroup.MSIX.Packaging"
   },
   "sourceName": "wts.ItemName",
   "preferNameDirectory": true,
-  "guids": ["86bd6ace-0448-48d7-9ae6-7c914cfab635"],
+  "guids": ["86bd6ace-0448-48d7-9ae6-7c914cfab635", "07ad151b-a614-4a13-aef0-5378d3f98e67"],
   "PrimaryOutputs": [
     { "path": "Param_ProjectName.Packaging/Param_ProjectName.Packaging.wapproj" }
   ],
@@ -80,7 +82,7 @@
       "manualInstructions": [ ],
       "actionId": "65057255-BD7B-443C-8180-5D82B9DA9E22",
       "args": {
-        "files" : "0"
+        "files": "0"
       },
       "continueOnError": true
     }

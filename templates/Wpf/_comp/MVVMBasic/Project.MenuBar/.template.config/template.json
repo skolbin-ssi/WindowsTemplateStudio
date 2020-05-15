@@ -11,10 +11,10 @@
       "language": "C#",
       "type": "item",
       "wts.type": "composition",
-      "wts.platform" : "Wpf",
+      "wts.platform": "Wpf",
       "wts.version": "1.0.0",
       "wts.compositionOrder": "2",
-      "wts.compositionFilter": "$projectType == MenuBarWpf & $frontendframework == MVVMBasic & wts.type == project"
+      "wts.compositionFilter": "$projectType == MenuBar & $frontendframework == MVVMBasic & wts.type == project"
     },
     "sourceName": "wts.ItemName",
     "preferNameDirectory": true,

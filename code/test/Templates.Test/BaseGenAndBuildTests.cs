@@ -19,6 +19,7 @@ using Microsoft.Templates.Core.Helpers;
 using Microsoft.Templates.Core.Extensions;
 using Microsoft.Templates.Core.Naming;
 using Microsoft.Templates.UI.Services;
+using Microsoft.Templates.Test.BuildWithLegacy;
 
 namespace Microsoft.Templates.Test
 {
@@ -28,8 +29,10 @@ namespace Microsoft.Templates.Test
         private readonly string _emptyBackendFramework = string.Empty;
         protected const string All = "all";
 
-        protected List<string> excludedTemplatesGroup1 = new List<string>() { "wts.Service.IdentityOptionalLogin", "wts.Feat.MultiInstanceAdvanced", "wts.Feat.MultiInstance" };
-        protected List<string> excludedTemplatesGroup2 = new List<string>() { "wts.Service.IdentityForcedLogin", "wts.Feat.BackgroundTask" };
+        protected List<string> excludedTemplates_Uwp_Group1 = new List<string>() { "wts.Service.IdentityOptionalLogin", "wts.Feat.MultiInstanceAdvanced", "wts.Feat.MultiInstance" };
+        protected List<string> excludedTemplates_Uwp_Group2 = new List<string>() { "wts.Service.IdentityForcedLogin", "wts.Feat.BackgroundTask" };
+        protected List<string> excludedTemplates_Wpf_Group1 = new List<string>() { "wts.Wpf.Service.IdentityOptionalLogin" };
+        protected List<string> excludedTemplates_Wpf_Group2 = new List<string>() { "wts.Wpf.Service.IdentityForcedLogin" };
         protected List<string> excludedTemplatesGroup1VB = new List<string>() { "wts.Service.IdentityOptionalLogin.VB", "wts.Feat.MultiInstanceAdvanced.VB", "wts.Feat.MultiInstance.VB" };
         protected List<string> excludedTemplatesGroup2VB = new List<string>() { "wts.Service.IdentityForcedLogin.VB", "wts.Feat.BackgroundTask.VB" };
 
@@ -84,7 +87,7 @@ namespace Microsoft.Templates.Test
         protected async Task<(string projectName, string projectPath)> GenerateEmptyProjectAsync(string projectType, string framework, string platform, string language)
         {
 
-            var projectName = $"{ShortProjectType(projectType)}";
+            var projectName = $"{ShortProjectType(projectType)}Empty{ShortLanguageName(language)}";
 
             var projectPath = await AssertGenerateProjectAsync(projectName, projectType, framework, platform, language, null, null);
 
@@ -209,8 +212,35 @@ namespace Microsoft.Templates.Test
 
         protected void AssertBuildProjectAsync(string projectPath, string projectName, string platform, bool deleteAfterBuild = true)
         {
+            (int exitCode, string outputFile) result = (1, string.Empty);
+
             // Build solution
-            var result = _fixture.BuildSolution(projectName, projectPath, platform);
+            switch (platform)
+            {
+                case Platforms.Uwp:
+                    result = _fixture.BuildSolutionUwp(projectName, projectPath, platform);
+                    break;
+                case Platforms.Wpf:
+                    result = _fixture.BuildSolutionWpf(projectName, projectPath, platform);
+                    break;
+            }
+
+
+            // Assert
+            Assert.True(result.exitCode.Equals(0), $"Solution {projectName} was not built successfully. {Environment.NewLine}Errors found: {_fixture.GetErrorLines(result.outputFile)}.{Environment.NewLine}Please see {Path.GetFullPath(result.outputFile)} for more details.");
+
+            // Clean
+            if (deleteAfterBuild)
+            {
+                Fs.SafeDeleteDirectory(projectPath);
+            }
+        }
+
+
+        protected void AssertBuildProjectWpfWithMsixAsync(string projectPath, string projectName, string platform, bool deleteAfterBuild = true)
+        {
+            // Build solution
+            var result = _fixture.BuildSolutionWpfWithMsix(projectName, projectPath, platform);
 
             // Assert
             Assert.True(result.exitCode.Equals(0), $"Solution {projectName} was not built successfully. {Environment.NewLine}Errors found: {_fixture.GetErrorLines(result.outputFile)}.{Environment.NewLine}Please see {Path.GetFullPath(result.outputFile)} for more details.");
@@ -224,7 +254,7 @@ namespace Microsoft.Templates.Test
 
         protected void AssertBuildProjectThenRunTestsAsync(string projectPath, string projectName, string platform)
         {
-            var (buildExitCode, buildOutputFile) = _fixture.BuildSolution(projectName, projectPath, platform);
+            var (buildExitCode, buildOutputFile) = _fixture.BuildSolutionUwp(projectName, projectPath, platform);
 
             if (buildExitCode.Equals(0))
             {
@@ -506,12 +536,6 @@ namespace Microsoft.Templates.Test
             };
         }
 
-        // Need overload with different number of params to work with XUnit.MemberData
-        public static IEnumerable<object[]> GetProjectTemplatesForBuild(string framework)
-        {
-            return GetProjectTemplatesForBuild(framework, string.Empty, string.Empty);
-        }
-
         // Set a single programming language to stop the fixture using all languages available to it
         public static IEnumerable<object[]> GetProjectTemplatesForBuild(string framework, string programmingLanguage, string platform)
         {
@@ -536,7 +560,14 @@ namespace Microsoft.Templates.Test
                     break;
 
                 case "LegacyFrameworks":
-                    result = BuildRightClickWithLegacyFixture.GetProjectTemplates();
+                    if (programmingLanguage == ProgrammingLanguages.CSharp)
+                    {
+                        result = BuildRightClickWithLegacyCSharpFixture.GetProjectTemplates();
+                    }
+                    if (programmingLanguage == ProgrammingLanguages.VisualBasic)
+                    {
+                        result = BuildRightClickWithLegacyVBFixture.GetProjectTemplates();
+                    }
                     break;
 
                 case "Prism":
@@ -544,8 +575,7 @@ namespace Microsoft.Templates.Test
                     break;
 
                 default:
-                    result = BuildFixture.GetProjectTemplates();
-                    break;
+                    throw new ArgumentOutOfRangeException(nameof(framework));
             }
 
             return result;

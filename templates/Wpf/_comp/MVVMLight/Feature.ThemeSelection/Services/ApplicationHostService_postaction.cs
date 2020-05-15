@@ -6,7 +6,6 @@
 //{[{
         private readonly IThemeSelectorService _themeSelectorService;
 //}]}
-
         public ApplicationHostService(/*{[{*/IThemeSelectorService themeSelectorService/*}]}*/)
         {
 //^^
@@ -21,6 +20,7 @@
 //{[{
             _themeSelectorService.SetTheme();
 //}]}
+            await Task.CompletedTask;
         }
     }
 }

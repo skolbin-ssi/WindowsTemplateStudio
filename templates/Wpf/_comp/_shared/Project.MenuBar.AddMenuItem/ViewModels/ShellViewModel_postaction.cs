@@ -1,12 +1,12 @@
 ﻿namespace Param_RootNamespace.ViewModels
 {
-    public class ShellViewModel : System.ComponentModel.INotifyPropertyChanged, IDisposable
+    public class ShellViewModel : System.ComponentModel.INotifyPropertyChanged
     {
         private RelayCommand _goBackCommand;
 //{[{
         private ICommand _menuViewswts.ItemNameCommand;
 //}]}
-
+        private ICommand _loadedCommand;
         public System.Windows.Input.ICommand GoBackCommand => _goBackCommand ?? (_goBackCommand = new System.Windows.Input.ICommand(OnGoBack, CanGoBack));
 //{[{
 

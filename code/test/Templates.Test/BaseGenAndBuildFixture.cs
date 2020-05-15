@@ -77,15 +77,17 @@ namespace Microsoft.Templates.Test
                     .Concat(userSelection.Features.Select(f => f.Name))
                     .Concat(userSelection.Services.Select(f => f.Name))
                     .Concat(userSelection.Testing.Select(f => f.Name));
-                
+
                 if (template.ItemNameEditable)
                 {
                     var itemBameValidationService = new ItemNameService(GenContext.ToolBox.Repo.ItemNameValidationConfig, () => usedNames);
                     itemName = itemBameValidationService.Infer(itemName);
                 }
+                else
+                {
+                    itemName = template.DefaultName;
+                }
                 
-
-               
                 AddItem(userSelection, itemName, template);
             }
         }
@@ -110,18 +112,18 @@ namespace Microsoft.Templates.Test
             userSelection.Add(selectedTemplate, template.TemplateType);
         }
 
-        public (int exitCode, string outputFile) BuildMsixBundle(string projectName, string outputPath, string projectExtension)
+        public (int exitCode, string outputFile) BuildMsixBundle(string projectName, string outputPath, string packagingProjectName, string packagingProjectExtension, string batfile)
         {
             var outputFile = Path.Combine(outputPath, $"_buildOutput_{projectName}.txt");
 
             var solutionFile = Path.GetFullPath(outputPath + @"\" + projectName + ".sln");
-            var projectFile = Path.GetFullPath(outputPath + @"\" + projectName + @"\" + projectName + $".{projectExtension}");
+            var projectFile = Path.GetFullPath(outputPath + @"\" + packagingProjectName + @"\" + packagingProjectName + $".{packagingProjectExtension}");
 
             Console.Out.WriteLine();
             Console.Out.WriteLine($"### > Ready to start building");
-            Console.Out.Write($"### > Running following command: {GetPath("RestoreAndBuildAppx.bat")} \"{projectFile}\"");
+            Console.Out.Write($"### > Running following command: {GetPath(batfile)} \"{solutionFile}\"");
 
-            var startInfo = new ProcessStartInfo(GetPath("RestoreAndBuildAppx.bat"))
+            var startInfo = new ProcessStartInfo(GetPath(batfile))
             {
                 Arguments = $"\"{solutionFile}\" \"{projectFile}\" ",
                 UseShellExecute = false,
@@ -146,9 +148,9 @@ namespace Microsoft.Templates.Test
 
             Console.Out.WriteLine();
             Console.Out.WriteLine("### > Ready to run WACK test");
-            Console.Out.Write($"### > Running following command: {GetPath("RunWackTest.bat")} \"{bundleFilePath}\" \"{resultFile}\"");
+            Console.Out.Write($"### > Running following command: {GetPath("bat\\RunWackTest.bat")} \"{bundleFilePath}\" \"{resultFile}\"");
 
-            var startInfo = new ProcessStartInfo(GetPath("RunWackTest.bat"))
+            var startInfo = new ProcessStartInfo(GetPath("bat\\RunWackTest.bat"))
             {
                 Arguments = $"\"{bundleFilePath}\" \"{resultFile}\" ",
                 UseShellExecute = false,
@@ -196,32 +198,35 @@ namespace Microsoft.Templates.Test
             throw new ApplicationException("No valid randomName could be generated");
         }
 
-        public (int exitCode, string outputFile) BuildSolution(string solutionName, string outputPath, string platform)
+        public (int exitCode, string outputFile) BuildSolutionUwp(string solutionName, string outputPath, string platform)
+        {
+            return BuildSolution(solutionName, outputPath, platform, "bat\\Uwp\\RestoreAndBuild.bat", "Debug", "x86");
+        }
+
+        public (int exitCode, string outputFile) BuildSolutionWpf(string solutionName, string outputPath, string platform)
+        {
+            return BuildSolution(solutionName, outputPath, platform, "bat\\Wpf\\RestoreAndBuild.bat", "Debug", "Any CPU" );
+        }
+
+        public (int exitCode, string outputFile) BuildSolutionWpfWithMsix(string solutionName, string outputPath, string platform)
+        {
+            return BuildSolution(solutionName, outputPath, platform, "bat\\Wpf\\RestoreAndBuildWithMsix.bat", "Debug", "x86");
+        }
+
+        private (int exitCode, string outputFile) BuildSolution(string solutionName, string outputPath, string platform, string batfile, string config, string buildPlatform)
         {
             var outputFile = Path.Combine(outputPath, $"_buildOutput_{solutionName}.txt");
 
             // Build
             var solutionFile = Path.GetFullPath(outputPath + @"\" + solutionName + ".sln");
 
-            var config = "Debug";
-            var batFile = "RestoreAndBuild.bat";
-            var buildPlatform = "x86";
-
-
-            if (platform == Platforms.Wpf)
-            {
-                batFile = "RestoreAndBuildWpf.bat";
-                buildPlatform = "Any CPU";
-            }
-
-
-            var batPath = Path.GetDirectoryName(GetPath(batFile));
+            var batPath = Path.GetDirectoryName(GetPath(batfile));
 
             Console.Out.WriteLine();
             Console.Out.WriteLine($"### > Ready to start building");
-            Console.Out.Write($"### > Running following command: {GetPath(batFile)} \"{solutionFile}\" {buildPlatform} {config}");
+            Console.Out.Write($"### > Running following command: {GetPath(batfile)} \"{solutionFile}\" {buildPlatform} {config}");
 
-            var startInfo = new ProcessStartInfo(GetPath(batFile))
+            var startInfo = new ProcessStartInfo(GetPath(batfile))
             {
                 Arguments = $"\"{solutionFile}\" \"{buildPlatform}\" \"{config}\" \"{batPath}\"",
                 UseShellExecute = false,
@@ -245,7 +250,7 @@ namespace Microsoft.Templates.Test
 
             var solutionFile = Path.GetFullPath(outputPath + @"\" + projectName + ".sln");
 
-            const string batFile = "RunTests.bat";
+            const string batFile = "bat\\Uwp\\RunTests.bat";
 
             // Just run the tests against code in the core library. Can't run UI related/dependent code from the cmd line / on the server
             var mstestPath = $"\"{outputPath}\\{projectName}.Core.Tests.MSTest\\bin\\Debug\\netcoreapp2.1\\{projectName}.Core.Tests.MSTest.dll\" ";
@@ -284,7 +289,7 @@ namespace Microsoft.Templates.Test
         public string GetTestSummary(string filePath)
         {
             var outputLines = File.ReadAllLines(filePath);
-            var summaryLines = outputLines.Where(l => l.StartsWith("Total tests") || l.StartsWith("Test "));
+            var summaryLines = outputLines.Where(l => l.StartsWith("Total tests", StringComparison.OrdinalIgnoreCase) || l.StartsWith("Test ", StringComparison.OrdinalIgnoreCase));
 
             return summaryLines.Any() ? summaryLines.Aggregate((i, j) => i + Environment.NewLine + j) : string.Empty;
         }

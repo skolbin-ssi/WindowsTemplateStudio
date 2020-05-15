@@ -17,6 +17,7 @@ using Microsoft.Templates.UI.Mvvm;
 using Microsoft.Templates.UI.Resources;
 using Microsoft.Templates.UI.Services;
 using Microsoft.Templates.UI.Threading;
+using Microsoft.Templates.UI.VisualStudio;
 
 namespace Microsoft.Templates.UI.ViewModels.Common
 {
@@ -53,7 +54,7 @@ namespace Microsoft.Templates.UI.ViewModels.Common
 
         public abstract Task ProcessItemAsync(object item);
 
-        protected abstract Task OnTemplatesAvailableAsync();
+        public abstract Task OnTemplatesAvailableAsync();
 
         public virtual void UnsubscribeEventHandlers()
         {
@@ -62,27 +63,18 @@ namespace Microsoft.Templates.UI.ViewModels.Common
             StylesService.UnsubscribeEventHandlers();
         }
 
-        public virtual async Task InitializeAsync(string platform, string language)
+        public virtual void Initialize(string platform, string language)
         {
             Platform = platform;
             Language = language;
 
-            // Templates generation is not suported in following cases:
-            // - WPF Projects from VisualStudio 2017
-            var vsInfo = GenContext.ToolBox.Shell.GetVSTelemetryInfo();
-            if (!string.IsNullOrEmpty(vsInfo.VisualStudioExeVersion))
-            {
-                // VisualStudioExeVersion is Empty on UI Test or VSEmulator execution
-                var version = Version.Parse(vsInfo.VisualStudioExeVersion);
-                if (Platform == Platforms.Wpf && (version.Major < 16 || (version.Major == 16 && version.Minor < 3)))
-                {
-                    WizardStatus.CanNotGenerateProjectsMessage = StringRes.CanNotGenerateWPFProjectsMessage;
-                    return;
-                }
-            }
-
-            GenContext.ToolBox.Repo.Sync.SyncStatusChanged += OnSyncStatusChanged;
             SystemService.Initialize();
+        }
+
+        public virtual async Task SynchronizeAsync()
+        {
+            GenContext.ToolBox.Repo.Sync.SyncStatusChanged += OnSyncStatusChanged;
+
             try
             {
                 await GenContext.ToolBox.Repo.SynchronizeAsync();

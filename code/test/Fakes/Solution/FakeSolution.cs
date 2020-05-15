@@ -71,9 +71,31 @@ namespace Microsoft.Templates.Fakes
 
         private const string WpfProjectConfigurationTemplate = @"		{0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{0}.Debug|ARM.Build.0 = Debug|Any CPU
+		{0}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{0}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0}.Debug|x64.Build.0 = Debug|Any CPU
+		{0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0}.Debug|x86.Build.0 = Debug|Any CPU
 		{0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0}.Release|Any CPU.Build.0 = Release|Any CPU
-";
+		{0}.Release|ARM.ActiveCfg = Release|Any CPU
+		{0}.Release|ARM.Build.0 = Release|Any CPU
+		{0}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{0}.Release|ARM64.Build.0 = Release|Any CPU
+		{0}.Release|x64.ActiveCfg = Release|Any CPU
+		{0}.Release|x64.Build.0 = Release|Any CPU
+		{0}.Release|x86.ActiveCfg = Release|Any CPU
+		{0}.Release|x86.Build.0 = Release|Any CPU
+	";
+
+        private const string WpfCoreProjectConfigurationTemplate = @"		{0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0}.Release|Any CPU.Build.0 = Release|Any CPU
+	";
 
         private const string MSIXProjectConfigurationTemplate = @"		{0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -139,7 +161,7 @@ EndProject
             if (slnContent.IndexOf(projectName, StringComparison.Ordinal) == -1)
             {
                 var globalIndex = slnContent.IndexOf("Global", StringComparison.Ordinal);
-                var projectTypeGuid = GetProjectGuid(Path.GetExtension(projectRelativeToSolutionPath), isCPSProject);
+                var projectTypeGuid = GetProjectTypeGuid(Path.GetExtension(projectRelativeToSolutionPath), isCPSProject);
                 projectGuid = projectGuid.Contains("{") ? projectGuid : "{" + projectGuid + "}";
                 var projectContent = ProjectTemplate
                                             .Replace("{guid}", projectTypeGuid)
@@ -244,7 +266,7 @@ EndProject
             return slnContent;
         }
 
-        private static string GetProjectGuid(string projectExtension, bool isCPSProject)
+        private static string GetProjectTypeGuid(string projectExtension, bool isCPSProject)
         {
             // See https://github.com/dotnet/project-system/blob/master/docs/opening-with-new-project-system.md
             switch (projectExtension)
@@ -276,6 +298,10 @@ EndProject
                     if (projectRelativeToSolutionPath.Contains("wapproj"))
                     {
                         return MSIXProjectConfigurationTemplate;
+                    }
+                    else if (projectRelativeToSolutionPath.Contains(".Core."))
+                    {
+                        return WpfCoreProjectConfigurationTemplate;
                     }
                     else
                     {

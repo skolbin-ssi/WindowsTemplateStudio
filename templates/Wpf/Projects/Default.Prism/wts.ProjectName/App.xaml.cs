@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Extensions.Configuration;
@@ -9,8 +10,6 @@ using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.Unity;
 using Param_RootNamespace.Constants;
-using Param_RootNamespace.Core.Contracts.Services;
-using Param_RootNamespace.Core.Services;
 using Param_RootNamespace.Models;
 using Param_RootNamespace.ViewModels;
 using Param_RootNamespace.Views;
@@ -29,9 +28,10 @@ namespace Param_RootNamespace
         protected override Window CreateShell()
             => Container.Resolve<ShellWindow>();
 
-        public override void Initialize()
+        protected override async void OnInitialized()
         {
-            base.Initialize();
+            base.OnInitialized();
+            await Task.CompletedTask;
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -43,12 +43,11 @@ namespace Param_RootNamespace
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             // Core Services
-            containerRegistry.Register<IFilesService, FilesService>();
 
             // App Services
 
             // Views
-            containerRegistry.RegisterForNavigation<ShellWindow>();
+            containerRegistry.RegisterForNavigation<ShellWindow, ShellViewModel>();
 
             // Configuration
             var configuration = BuildConfiguration();
@@ -69,20 +68,6 @@ namespace Param_RootNamespace
                 .AddJsonFile("appsettings.json")
                 .AddCommandLine(_startUpArgs)
                 .Build();
-        }
-
-        protected override void ConfigureViewModelLocator()
-        {
-            base.ConfigureViewModelLocator();
-
-            // We are remapping the default ViewName and ViewNameViewModel naming to ViewNamePage and ViewNameViewModel to
-            // gain better code reuse with other frameworks and pages within Windows Template Studio
-            ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver((viewType) =>
-            {
-                var viewModelName = string.Format(CultureInfo.InvariantCulture, "Param_RootNamespace.ViewModels.{0}ViewModel, Param_RootNamespace", viewType.Name[0..^4]);
-                return Type.GetType(viewModelName);
-            });
-            ViewModelLocationProvider.Register(typeof(ShellWindow).FullName, typeof(ShellViewModel));
         }
 
         private void OnExit(object sender, ExitEventArgs e)

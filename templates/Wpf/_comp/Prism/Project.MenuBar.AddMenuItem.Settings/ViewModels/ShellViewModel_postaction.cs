@@ -3,7 +3,7 @@ using Param_RootNamespace.Contracts.Services;
 //}]}
 namespace Param_RootNamespace.ViewModels
 {
-    public class ShellViewModel : BindableBase, IDisposable
+    public class ShellViewModel : BindableBase
     {
 //{[{
         private readonly IRightPaneService _rightPaneService;
@@ -12,7 +12,7 @@ namespace Param_RootNamespace.ViewModels
 //{[{
         private ICommand _menuFilewts.ItemNameCommand;
 //}]}
-
+        private ICommand _loadedCommand;
         public DelegateCommand GoBackCommand => _goBackCommand ?? (_goBackCommand = new DelegateCommand(OnGoBack, CanGoBack));
 //{[{
 

@@ -6,7 +6,6 @@
 //{[{
         private readonly IPersistAndRestoreService _persistAndRestoreService;
 //}]}
-
         public ApplicationHostService(/*{[{*/IPersistAndRestoreService persistAndRestoreService/*}]}*/)
         {
 //^^
@@ -17,7 +16,6 @@
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await Task.CompletedTask;
 //{[{
             _persistAndRestoreService.PersistData();
 //}]}
@@ -25,7 +23,6 @@
 
         private async Task InitializeAsync()
         {
-            await Task.CompletedTask;
 //{[{
             _persistAndRestoreService.RestoreData();
 //}]}

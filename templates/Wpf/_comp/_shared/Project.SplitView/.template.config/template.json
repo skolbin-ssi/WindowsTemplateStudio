@@ -11,14 +11,17 @@
       "language": "C#",
       "type": "item",
       "wts.type": "composition",
-      "wts.platform" : "Wpf",
+      "wts.platform": "Wpf",
       "wts.version": "1.0.0",
       "wts.compositionOrder": "0",
-      "wts.compositionFilter": "$projectType == SplitViewWpf & $frontendframework == MVVMBasic|MVVMLight & wts.type == project"
+      "wts.compositionFilter": "$projectType == SplitView & $frontendframework == MVVMBasic|MVVMLight & wts.type == project"
     },
     "sourceName": "wts.ItemName",
     "preferNameDirectory": true,
     "PrimaryOutputs": [
+      {
+        "path": "TemplateSelectors/MenuItemTemplateSelector.cs"
+      },
       {
         "path": "ViewModels/ShellViewModel.cs"
       },
@@ -45,10 +48,6 @@
       "commandclass": {
         "type": "parameter",
         "replaces": "System.Windows.Input.ICommand"
-      },
-      "canExecuteChangedMethodName": {
-        "type": "parameter",
-        "replaces": "Param_CanExecuteChangedMethodName"
       }
     }
   }

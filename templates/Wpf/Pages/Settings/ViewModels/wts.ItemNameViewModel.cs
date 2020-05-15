@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Reflection;
 using System.Windows.Input;
 using Param_RootNamespace.Contracts.Services;
 using Param_RootNamespace.Models;
+using Param_RootNamespace.Contracts.Services;
 
 namespace Param_RootNamespace.ViewModels
 {
+    // TODO WTS: Change the URL for your privacy policy in the appsettings.json file, currently set to https://YourPrivacyUrlGoesHere
     public class wts.ItemNameViewModel : System.ComponentModel.INotifyPropertyChanged, INavigationAware
     {
         private readonly AppConfig _config;
         private readonly IThemeSelectorService _themeSelectorService;
+        private readonly ISystemService _systemService;
+        private readonly IApplicationInfoService _applicationInfoService;
         private AppTheme _theme;
         private string _versionDescription;
         private ICommand _setThemeCommand;
@@ -32,28 +34,22 @@ namespace Param_RootNamespace.ViewModels
 
         public ICommand PrivacyStatementCommand => _privacyStatementCommand ?? (_privacyStatementCommand = new System.Windows.Input.ICommand(OnPrivacyStatement));
 
-        public wts.ItemNameViewModel(Param_ConfigType config, IThemeSelectorService themeSelectorService)
+        public wts.ItemNameViewModel(Param_ConfigType config, IThemeSelectorService themeSelectorService, ISystemService systemService, IApplicationInfoService applicationInfoService)
         {
             _config = Param_ConfigValue;
             _themeSelectorService = themeSelectorService;
+            _systemService = systemService;
+            _applicationInfoService = applicationInfoService;
         }
 
         public void OnNavigatedTo(Param_OnNavigatedToParams)
         {
-            VersionDescription = GetVersionDescription();
+            VersionDescription = $"Param_ProjectName - {_applicationInfoService.GetVersion()}";
             Theme = _themeSelectorService.GetCurrentTheme();
         }
 
         public void OnNavigatedFrom(Param_OnNavigatedFromParams)
         {
-        }
-
-        private string GetVersionDescription()
-        {
-            var appName = "Param_ProjectName";
-            string assemblyLocation = Assembly.GetExecutingAssembly().Location;
-            var versionInfo = FileVersionInfo.GetVersionInfo(assemblyLocation);
-            return $"{appName} - {versionInfo.FileVersion}";
         }
 
         private void OnSetTheme(string themeName)
@@ -63,15 +59,6 @@ namespace Param_RootNamespace.ViewModels
         }
 
         private void OnPrivacyStatement()
-        {
-            // There is an open Issue on this
-            // https://github.com/dotnet/corefx/issues/10361
-            ProcessStartInfo psi = new ProcessStartInfo
-            {
-                FileName = _config.PrivacyStatement,
-                UseShellExecute = true
-            };
-            Process.Start(psi);
-        }
+            => _systemService.OpenInWebBrowser(_config.PrivacyStatement);
     }
 }

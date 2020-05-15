@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:strings="clr-namespace:Param_RootNamespace.Strings"
+    xmlns:properties="clr-namespace:Param_RootNamespace.Properties"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800">
     <System.Windows.Controls.Page.Resources>
@@ -18,7 +18,8 @@
                     Grid.Column="0"
                     Text="{Binding Symbol}"
                     Style="{StaticResource MediumIconStyle}"
-                    Margin="{StaticResource XSmallLeftMargin}" />
+                    Margin="{StaticResource XSmallLeftMargin}"
+                    AutomationProperties.Name="List item icon" />
                 <StackPanel
                     Grid.Column="1"
                     Margin="{StaticResource SmallLeftMargin}"
@@ -37,7 +38,8 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                         <TextBlock
                             Text="{Binding Symbol}"
-                            Style="{StaticResource BigIconStyle}" />
+                            Style="{StaticResource BigIconStyle}"
+                            AutomationProperties.Name="Detail icon" />
                         <TextBlock
                             Margin="{StaticResource SmallLeftMargin}"
                             VerticalAlignment="Center"
@@ -86,7 +88,9 @@
                             Text="Note 1" />
                         <TextBlock
                             Style="{StaticResource BodyTextStyle}"
-                            Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis hendrerit nulla, vel molestie libero. In nec ultricies magna, ultricies molestie ipsum. Mauris non dignissim velit. Etiam malesuada blandit mauris eu maximus. Quisque ornare, felis nec scelerisque mollis, risus dolor posuere magna, in gravida quam mi id nisi. Nullam mattis consequat ex. Cras nulla neque, dictum ac urna et, vestibulum feugiat ex. Pellentesque malesuada accumsan ligula, vel fringilla lacus facilisis sit amet. Proin convallis tempor arcu, ac placerat libero pretium ut. Praesent hendrerit nisl at lobortis viverra. Fusce vitae velit odio. Nam ut tortor sed purus finibus sollicitudin quis at ante. Ut sodales dolor vel eros mollis suscipit. Donec eu nulla id urna ultricies consequat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;" />
+                            Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis hendrerit nulla, vel molestie libero. In nec ultricies magna, ultricies molestie ipsum. Mauris non dignissim velit. Etiam malesuada blandit mauris eu maximus. Quisque ornare, felis nec scelerisque mollis, risus dolor posuere magna, in gravida quam mi id nisi. Nullam mattis consequat ex. Cras nulla neque, dictum ac urna et, vestibulum feugiat ex. Pellentesque malesuada accumsan ligula, vel fringilla lacus facilisis sit amet. Proin convallis tempor arcu, ac placerat libero pretium ut. Praesent hendrerit nisl at lobortis viverra. Fusce vitae velit odio. Nam ut tortor sed purus finibus sollicitudin quis at ante. Ut sodales dolor vel eros mollis suscipit. Donec eu nulla id urna ultricies consequat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;"
+                            AutomationProperties.Name="Detail note 1"
+                            AutomationProperties.HelpText="{Binding Text, RelativeSource={RelativeSource Self}}" />
 
                         <TextBlock
                             Margin="{StaticResource SmallTopMargin}"
@@ -95,7 +99,9 @@
                         <TextBlock
                             Margin="{StaticResource MediumBottomMargin}"
                             Style="{StaticResource BodyTextStyle}"
-                            Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis hendrerit nulla, vel molestie libero. In nec ultricies magna, ultricies molestie ipsum. Mauris non dignissim velit. Etiam malesuada blandit mauris eu maximus. Quisque ornare, felis nec scelerisque mollis, risus dolor posuere magna, in gravida quam mi id nisi. Nullam mattis consequat ex. Cras nulla neque, dictum ac urna et, vestibulum feugiat ex. Pellentesque malesuada accumsan ligula, vel fringilla lacus facilisis sit amet. Proin convallis tempor arcu, ac placerat libero pretium ut. Praesent hendrerit nisl at lobortis viverra. Fusce vitae velit odio. Nam ut tortor sed purus finibus sollicitudin quis at ante. Ut sodales dolor vel eros mollis suscipit. Donec eu nulla id urna ultricies consequat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;" />
+                            Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis hendrerit nulla, vel molestie libero. In nec ultricies magna, ultricies molestie ipsum. Mauris non dignissim velit. Etiam malesuada blandit mauris eu maximus. Quisque ornare, felis nec scelerisque mollis, risus dolor posuere magna, in gravida quam mi id nisi. Nullam mattis consequat ex. Cras nulla neque, dictum ac urna et, vestibulum feugiat ex. Pellentesque malesuada accumsan ligula, vel fringilla lacus facilisis sit amet. Proin convallis tempor arcu, ac placerat libero pretium ut. Praesent hendrerit nisl at lobortis viverra. Fusce vitae velit odio. Nam ut tortor sed purus finibus sollicitudin quis at ante. Ut sodales dolor vel eros mollis suscipit. Donec eu nulla id urna ultricies consequat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;"
+                            AutomationProperties.Name="Detail note 2"
+                            AutomationProperties.HelpText="{Binding Text, RelativeSource={RelativeSource Self}}" />
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
@@ -114,7 +120,7 @@
             <TextBlock
                 Style="{StaticResource PageTitleStyle}"
                 Margin="{StaticResource MediumLeftMargin}"
-                Text="{x:Static strings:Resources.wts.ItemNamePageTitle}" />
+                Text="{x:Static properties:Resources.wts.ItemNamePageTitle}" />
             <ListView
                 Grid.Row="1"
                 ItemsSource="{Binding SampleItems}"

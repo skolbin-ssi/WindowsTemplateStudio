@@ -44,14 +44,18 @@
 //^^
 //{[{
         private void OnOptionsMenuItemInvoked()
-            => RequestNavigate(SelectedOptionsMenuItem.Tag.ToString());
+            => RequestNavigate(SelectedOptionsMenuItem.Tag?.ToString());
 //}]}
+
+        private void RequestNavigate(string target)
+        {
+        }
 
         private void OnNavigated(object sender, RegionNavigationEventArgs e)
         {
             var item = MenuItems
                         .OfType<HamburgerMenuItem>()
-                        .FirstOrDefault(i => e.Uri.ToString() == i.Tag.ToString());
+                        .FirstOrDefault(i => e.Uri.ToString() == i.Tag?.ToString());
             if (item != null)
             {
             }
@@ -60,7 +64,7 @@
             {
                 SelectedOptionsMenuItem = OptionMenuItems
                         .OfType<HamburgerMenuItem>()
-                        .FirstOrDefault(i => e.Uri.ToString() == i.Tag.ToString());
+                        .FirstOrDefault(i => e.Uri.ToString() == i.Tag?.ToString());
             }
 //}]}
         }

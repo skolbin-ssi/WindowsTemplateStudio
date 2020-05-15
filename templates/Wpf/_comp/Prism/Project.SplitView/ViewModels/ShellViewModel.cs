@@ -1,10 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
 using Param_RootNamespace.Constants;
-using Param_RootNamespace.Models;
-using Param_RootNamespace.Strings;
+using Param_RootNamespace.Properties;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -18,6 +18,7 @@ namespace Param_RootNamespace.ViewModels
         private HamburgerMenuItem _selectedMenuItem;
         private DelegateCommand _goBackCommand;
         private ICommand _loadedCommand;
+        private ICommand _unloadedCommand;
         private ICommand _menuItemInvokedCommand;
 
         public HamburgerMenuItem SelectedMenuItem
@@ -35,6 +36,8 @@ namespace Param_RootNamespace.ViewModels
 
         public ICommand LoadedCommand => _loadedCommand ?? (_loadedCommand = new DelegateCommand(OnLoaded));
 
+        public ICommand UnloadedCommand => _unloadedCommand ?? (_unloadedCommand = new DelegateCommand(OnUnloaded));
+
         public ICommand MenuItemInvokedCommand => _menuItemInvokedCommand ?? (_menuItemInvokedCommand = new DelegateCommand(OnMenuItemInvoked));
 
         public ShellViewModel(IRegionManager regionManager)
@@ -49,6 +52,12 @@ namespace Param_RootNamespace.ViewModels
             SelectedMenuItem = MenuItems.First();
         }
 
+        private void OnUnloaded()
+        {
+            _navigationService.Navigated -= OnNavigated;
+            _regionManager.Regions.Remove(Regions.Main);
+        }
+
         private bool CanGoBack()
             => _navigationService != null && _navigationService.Journal.CanGoBack;
 
@@ -56,7 +65,7 @@ namespace Param_RootNamespace.ViewModels
             => _navigationService.Journal.GoBack();
 
         private void OnMenuItemInvoked()
-            => RequestNavigate(SelectedMenuItem.Tag.ToString());
+            => RequestNavigate(SelectedMenuItem.Tag?.ToString());
 
         private void RequestNavigate(string target)
         {
@@ -70,7 +79,7 @@ namespace Param_RootNamespace.ViewModels
         {
             var item = MenuItems
                         .OfType<HamburgerMenuItem>()
-                        .FirstOrDefault(i => e.Uri.ToString() == i.Tag.ToString());
+                        .FirstOrDefault(i => e.Uri.ToString() == i.Tag?.ToString());
             if (item != null)
             {
                 SelectedMenuItem = item;

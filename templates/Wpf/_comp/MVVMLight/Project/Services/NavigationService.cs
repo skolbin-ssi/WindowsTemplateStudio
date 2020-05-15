@@ -45,6 +45,12 @@ namespace Param_RootNamespace.Services
             }
         }
 
+        public void UnsubscribeNavigation()
+        {
+            _frame.Navigated -= OnNavigated;
+            _frame = null;
+        }
+
         public void GoBack()
             => _frame.GoBack();
 
@@ -74,6 +80,9 @@ namespace Param_RootNamespace.Services
                 }
             }
         }
+
+        public void CleanNavigation()
+            => _frame.CleanNavigation();
 
         private void OnNavigated(object sender, NavigationEventArgs e)
         {

@@ -6,12 +6,12 @@ namespace Param_RootNamespace
 {
     public partial class App : PrismApplication
     {
-        public override void Initialize()
+        protected override async void OnInitialized()
         {
-//^^
 //{[{
             var themeSelectorService = Container.Resolve<IThemeSelectorService>();
             themeSelectorService.SetTheme();
+
 //}]}
         }
 
