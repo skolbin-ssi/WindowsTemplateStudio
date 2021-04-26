@@ -17,9 +17,9 @@ namespace Localization
 {
     internal class LocalizableItemsExtractor
     {
-        private RoutesManager _routesManager;
-        private ValidateLocalizableExtractor _validator;
-        private IEnumerable<string> _cultures;
+        private readonly RoutesManager _routesManager;
+        private readonly ValidateLocalizableExtractor _validator;
+        private readonly IEnumerable<string> _cultures;
 
         internal LocalizableItemsExtractor(string sourceDir, string destDir, ValidateLocalizableExtractor validator, IEnumerable<string> cultures)
         {
@@ -54,31 +54,16 @@ namespace Localization
 
         internal void ExtractProjectTemplates()
         {
-            var csPath = Path.Combine(Routes.ProjectTemplatePathCSUwp, Routes.ProjectTemplateFileCSUwp);
-            if (_validator.HasVsTemplatesChanges(csPath))
+            foreach (var projectTemplate in Routes.VSProjectTemplatePaths)
             {
-                ExtractProjectTemplatesByLanguage(
-                    Routes.ProjectTemplatePathCSUwp,
-                    Routes.ProjectTemplateFileCSUwp,
-                    Routes.ProjectTemplateFileNamePatternCSUwp);
-            }
-
-            var csPathWpf = Path.Combine(Routes.ProjectTemplatePathCSWpf, Routes.ProjectTemplateFileCSWpf);
-            if (_validator.HasVsTemplatesChanges(csPathWpf))
-            {
-                ExtractProjectTemplatesByLanguage(
-                    Routes.ProjectTemplatePathCSWpf,
-                    Routes.ProjectTemplateFileCSWpf,
-                    Routes.ProjectTemplateFileNamePatternCSWpf);
-            }
-
-            var vbPath = Path.Combine(Routes.ProjectTemplatePathVBUwp, Routes.ProjectTemplateFileVBUwp);
-            if (_validator.HasVsTemplatesChanges(vbPath))
-            {
-                ExtractProjectTemplatesByLanguage(
-                    Routes.ProjectTemplatePathVBUwp,
-                    Routes.ProjectTemplateFileVBUwp,
-                    Routes.ProjectTemplateFileNamePatternVBUwp);
+                var projectType = Path.Combine(projectTemplate.Path, projectTemplate.FileName);
+                if (_validator.HasVsTemplatesChanges(projectType))
+                {
+                    ExtractProjectTemplatesByLanguage(
+                        projectTemplate.Path,
+                        projectTemplate.FileName,
+                        projectTemplate.FileNamePattern);
+                }
             }
         }
 
@@ -87,10 +72,13 @@ namespace Localization
             FileInfo srcFile = _routesManager.GetFileFromSource(Path.Combine(projectTemplatePath, projectTemplateFile));
             var desDirectory = _routesManager.GetOrCreateDestDirectory(projectTemplatePath);
 
-            foreach (string culture in _cultures)
+            if (projectTemplateFileNamePattern != null)
             {
-                string desFile = Path.Combine(desDirectory.FullName, string.Format(projectTemplateFileNamePattern, culture));
-                srcFile.CopyTo(desFile, true);
+                foreach (string culture in _cultures)
+                {
+                    string desFile = Path.Combine(desDirectory.FullName, string.Format(projectTemplateFileNamePattern, culture));
+                    srcFile.CopyTo(desFile, true);
+                }
             }
         }
 

@@ -20,14 +20,15 @@ namespace Param_RootNamespace.Views
 
         private void OnItemInvoked(WinUI.NavigationView sender, WinUI.NavigationViewItemInvokedEventArgs args)
         {
-            //{[{
             if (args.IsSettingsInvoked)
             {
-                NavigationService.Navigate(typeof(wts.ItemNamePage));
-                return;
+//{--{
+                // Navigate to the settings page - implement as appropriate if needed
+//}--}
+                //{[{
+                NavigationService.Navigate(typeof(wts.ItemNamePage), null, args.RecommendedNavigationTransitionInfo);
+                //}]}
             }
-
-            //}]}
         }
     }
 }

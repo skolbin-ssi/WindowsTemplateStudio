@@ -1,6 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports System.Threading.Tasks
-Imports Param_RootNamespace.Core.Helpers
+﻿Imports Param_RootNamespace.Core.Helpers
 Imports Param_RootNamespace.Core.Models
 Imports Param_RootNamespace.Core.Services
 Imports Param_RootNamespace.Helpers
@@ -62,7 +60,7 @@ Namespace Services
         End Function
 
         Private Async Function GetUserFromGraphApiAsync() As Task(Of UserViewModel)
-            Dim accessToken = Await IdentityService.GetAccessTokenAsync()
+            Dim accessToken = Await IdentityService.GetAccessTokenForGraphAsync()
 
             If String.IsNullOrEmpty(accessToken) Then
                 Return Nothing

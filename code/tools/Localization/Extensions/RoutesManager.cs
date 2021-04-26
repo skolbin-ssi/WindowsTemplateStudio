@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,8 +11,8 @@ namespace Localization.Extensions
 {
     public class RoutesManager
     {
-        private DirectoryInfo _sourceDir;
-        private DirectoryInfo _destinationDir;
+        private readonly DirectoryInfo _sourceDir;
+        private readonly DirectoryInfo _destinationDir;
 
         public RoutesManager(string sourceDirPath, string destinationDirPath)
         {
@@ -82,14 +83,14 @@ namespace Localization.Extensions
 
         public string GetRelativePathFromSourceFile(FileInfo file)
         {
-            return file.FullName.StartsWith(_sourceDir.FullName)
+            return file.FullName.StartsWith(_sourceDir.FullName, StringComparison.OrdinalIgnoreCase)
                 ? file.FullName.Substring(_sourceDir.FullName.Length + 1)
                 : string.Empty;
         }
 
         public string GetRelativeDirectoryFromSource(DirectoryInfo directory)
         {
-            return directory.FullName.StartsWith(_sourceDir.FullName)
+            return directory.FullName.StartsWith(_sourceDir.FullName, StringComparison.OrdinalIgnoreCase)
                 ? directory.FullName.Substring(_sourceDir.FullName.Length + 1)
                 : string.Empty;
         }

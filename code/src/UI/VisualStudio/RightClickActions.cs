@@ -17,6 +17,7 @@ using Microsoft.Templates.UI.Resources;
 using Microsoft.Templates.UI.Services;
 using Microsoft.Templates.UI.Threading;
 using Microsoft.Templates.Utilities.Services;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TemplateWizard;
 using Microsoft.VisualStudio.Threading;
 
@@ -24,9 +25,20 @@ namespace Microsoft.Templates.UI.VisualStudio
 {
     public class RightClickActions : IContextProvider
     {
-        private static VsGenShell _shell;
+        private readonly IEnumerable<RightClickAvailability> _availableOptions = new List<RightClickAvailability>()
+        {
+            new RightClickAvailability(Platforms.Uwp, ProgrammingLanguages.CSharp) { TemplateTypes = new List<TemplateType>() { TemplateType.Page, TemplateType.Feature, TemplateType.Service, TemplateType.Testing } },
+            new RightClickAvailability(Platforms.Uwp, ProgrammingLanguages.VisualBasic) { TemplateTypes = new List<TemplateType>() { TemplateType.Page, TemplateType.Feature, TemplateType.Service, TemplateType.Testing } },
+            new RightClickAvailability(Platforms.Wpf, ProgrammingLanguages.CSharp) { TemplateTypes = new List<TemplateType>() { TemplateType.Page, TemplateType.Feature, TemplateType.Testing } },
+            new RightClickAvailability(Platforms.WinUI, ProgrammingLanguages.CSharp, AppModels.Desktop) { TemplateTypes = new List<TemplateType>() { TemplateType.Page, TemplateType.Feature } },
+            new RightClickAvailability(Platforms.WinUI, ProgrammingLanguages.CSharp, AppModels.Uwp) { TemplateTypes = new List<TemplateType>() { TemplateType.Page } },
+            new RightClickAvailability(Platforms.WinUI, ProgrammingLanguages.Cpp, AppModels.Desktop) { TemplateTypes = new List<TemplateType>() { TemplateType.Page } },
+            new RightClickAvailability(Platforms.WinUI, ProgrammingLanguages.Cpp, AppModels.Uwp) { TemplateTypes = new List<TemplateType>() { TemplateType.Page } },
+        };
 
-        private GenerationService _generationService = GenerationService.Instance;
+        private readonly GenerationService _generationService = GenerationService.Instance;
+
+        private static VsGenShell _shell;
 
         public string ProjectName { get; private set; }
 
@@ -53,10 +65,7 @@ namespace Microsoft.Templates.UI.VisualStudio
 
         public void AddNewPage()
         {
-            if (!_shell.GetActiveProjectIsWts())
-            {
-                return;
-            }
+            ThreadHelper.ThrowIfNotOnUIThread();
 
             try
             {
@@ -73,10 +82,7 @@ namespace Microsoft.Templates.UI.VisualStudio
 
         public void AddNewFeature()
         {
-            if (!_shell.GetActiveProjectIsWts())
-            {
-                return;
-            }
+            ThreadHelper.ThrowIfNotOnUIThread();
 
             try
             {
@@ -93,10 +99,7 @@ namespace Microsoft.Templates.UI.VisualStudio
 
         public void AddNewService()
         {
-            if (!_shell.GetActiveProjectIsWts())
-            {
-                return;
-            }
+            ThreadHelper.ThrowIfNotOnUIThread();
 
             try
             {
@@ -113,10 +116,7 @@ namespace Microsoft.Templates.UI.VisualStudio
 
         public void AddNewTesting()
         {
-            if (!_shell.GetActiveProjectIsWts())
-            {
-                return;
-            }
+            ThreadHelper.ThrowIfNotOnUIThread();
 
             try
             {
@@ -133,11 +133,26 @@ namespace Microsoft.Templates.UI.VisualStudio
 
         public bool Visible(TemplateType templateType)
         {
-            return _shell.GetActiveProjectIsWts() && EnsureGenContextInitialized() && GenContext.ToolBox.Repo.GetAll().Any(t => t.GetTemplateType() == templateType);
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (!_shell.GetActiveProjectIsWts())
+            {
+                return false;
+            }
+
+            var projectConfigInfoService = new ProjectConfigInfoService(_shell);
+            var configInfo = projectConfigInfoService.ReadProjectConfiguration();
+
+            var rightClickOptions = _availableOptions.FirstOrDefault(o =>
+                                        o.Platform == configInfo.Platform &&
+                                        o.Language == projectConfigInfoService.GetProgrammingLanguage() &&
+                                        o.AppModel == configInfo.AppModel);
+
+            return rightClickOptions != null ? rightClickOptions.TemplateTypes.Contains(templateType) : false;
         }
 
         public bool Visible()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             return _shell.GetActiveProjectIsWts();
         }
 
@@ -148,6 +163,7 @@ namespace Microsoft.Templates.UI.VisualStudio
 
         public void OpenTempFolder()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var tempPath = GetTempGenerationFolder();
             if (HasContent(tempPath))
             {
@@ -157,13 +173,16 @@ namespace Microsoft.Templates.UI.VisualStudio
 
         public bool TempFolderAvailable()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             return HasContent(GetTempGenerationFolder());
         }
 
         private void SetContext()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             EnsureGenContextInitialized();
-            if (GenContext.CurrentLanguage == _shell.GetActiveProjectLanguage())
+            var language = _shell.GetActiveProjectLanguage();
+            if (GenContext.CurrentLanguage == language)
             {
                 GenContext.Current = this;
 
@@ -180,29 +199,35 @@ namespace Microsoft.Templates.UI.VisualStudio
             }
         }
 
-        private void FinishGeneration(UserSelection userSelection, string statusBarMessage)
+        protected void FinishGeneration(UserSelection userSelection, string statusBarMessage)
+        {
+            SafeThreading.JoinableTaskFactory.Run(
+            async () =>
+            {
+                await FinishGenerationAsync(userSelection, statusBarMessage);
+            },
+            JoinableTaskCreationOptions.LongRunning);
+        }
+
+        protected async System.Threading.Tasks.Task FinishGenerationAsync(UserSelection userSelection, string statusBarMessage)
         {
             if (userSelection is null)
             {
                 return;
             }
 
-            SafeThreading.JoinableTaskFactory.Run(
-            async () =>
-            {
-                await SafeThreading.JoinableTaskFactory.SwitchToMainThreadAsync();
-                _generationService.FinishGeneration(userSelection);
-                _shell.ShowStatusBarMessage(statusBarMessage);
-            },
-            JoinableTaskCreationOptions.LongRunning);
+            await SafeThreading.JoinableTaskFactory.SwitchToMainThreadAsync();
+            _generationService.FinishGeneration(userSelection);
+            await _shell.ShowStatusBarMessageAsync(statusBarMessage);
         }
 
         private bool EnsureGenContextInitialized()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var projectLanguage = _shell.GetActiveProjectLanguage();
             var projectPlatform = ProjectMetadataService.GetProjectMetadata(_shell.GetActiveProjectPath()).Platform;
 
-            if (!string.IsNullOrEmpty(projectLanguage))
+            if (!string.IsNullOrEmpty(projectLanguage) && !string.IsNullOrEmpty(projectPlatform))
             {
                 if (GenContext.CurrentLanguage != projectLanguage || GenContext.CurrentPlatform != projectPlatform)
                 {
@@ -222,6 +247,7 @@ namespace Microsoft.Templates.UI.VisualStudio
 
         private static string GetTempGenerationFolder()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             string projectGuid = _shell.GetProjectGuidByName(_shell.GetActiveProjectName()).ToString();
             return Path.Combine(Path.GetTempPath(), Configuration.Current.TempGenerationFolderPath, projectGuid);
         }

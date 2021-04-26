@@ -26,7 +26,7 @@ namespace Param_RootNamespace.ViewModels
 
         public ObservableCollection<SampleImage> Source { get; } = new ObservableCollection<SampleImage>();
 
-        public ICommand ItemSelectedCommand => _itemSelectedCommand ?? (_itemSelectedCommand = new DelegateCommand<ItemClickEventArgs>(OnsItemSelected));
+        public ICommand ItemSelectedCommand => _itemSelectedCommand ?? (_itemSelectedCommand = new DelegateCommand<ItemClickEventArgs>(OnItemSelected));
 
         public ImageGalleryViewViewModel(INavigationService navigationServiceInstance, ISampleDataService sampleDataServiceInstance, IConnectedAnimationService connectedAnimationService)
         {
@@ -40,7 +40,7 @@ namespace Param_RootNamespace.ViewModels
             base.OnNavigatedTo(e, viewModelState);
             Source.Clear();
 
-            // TODO WTS: Replace this with your actual data
+            // Replace this with your actual data
             var data = await _sampleDataService.GetImageGalleryDataAsync("ms-appx:///Assets");
 
             foreach (var item in data)
@@ -49,7 +49,7 @@ namespace Param_RootNamespace.ViewModels
             }
         }
 
-        private void OnsItemSelected(ItemClickEventArgs args)
+        private void OnItemSelected(ItemClickEventArgs args)
         {
             var selected = args.ClickedItem as SampleImage;
             ImagesNavigationHelper.AddImageId(ImageGalleryViewSelectedIdKey, selected.ID);

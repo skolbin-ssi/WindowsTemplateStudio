@@ -31,36 +31,49 @@ namespace Microsoft.Templates.Test.Wack.Wpf
         {
         }
 
-
         [Theory]
-        [MemberData(nameof(GetProjectTemplatesForBuild), "MVVMBasic", ProgrammingLanguages.CSharp, Platforms.Wpf)]
-        public async Task WackTests_MvvmBasic_All_WPF(string projectType, string framework, string platform, string language)
+        [MemberData(nameof(GetProjectTemplatesForBuild), Frameworks.CodeBehind, ProgrammingLanguages.CSharp, Platforms.Wpf)]
+        public async Task WackTests_CodeBehind_All_WPFAsync(string projectType, string framework, string platform, string language)
         {
             await RunWackOnProjectWithAllPagesAndFeaturesAsync(projectType, framework, platform, language);
         }
 
         [Theory]
-        [MemberData(nameof(GetProjectTemplatesForBuild), "MVVMLight", ProgrammingLanguages.CSharp, Platforms.Wpf)]
-        public async Task WackTests_MVVMLight_All_WPF(string projectType, string framework, string platform, string language)
+        [MemberData(nameof(GetProjectTemplatesForBuild), Frameworks.MVVMBasic, ProgrammingLanguages.CSharp, Platforms.Wpf)]
+        public async Task WackTests_MvvmBasic_All_WPFAsync(string projectType, string framework, string platform, string language)
         {
             await RunWackOnProjectWithAllPagesAndFeaturesAsync(projectType, framework, platform, language);
         }
 
         [Theory]
-        [MemberData(nameof(GetProjectTemplatesForBuild), "Prism", ProgrammingLanguages.CSharp, Platforms.Wpf)]
-        public async Task WackTests_Prism_All_WPF(string projectType, string framework, string platform, string language)
+        [MemberData(nameof(GetProjectTemplatesForBuild), Frameworks.MVVMLight, ProgrammingLanguages.CSharp, Platforms.Wpf)]
+        public async Task WackTests_MVVMLight_All_WPFAsync(string projectType, string framework, string platform, string language)
         {
             await RunWackOnProjectWithAllPagesAndFeaturesAsync(projectType, framework, platform, language);
         }
 
+        [Theory]
+        [MemberData(nameof(GetProjectTemplatesForBuild), Frameworks.Prism, ProgrammingLanguages.CSharp, Platforms.Wpf)]
+        public async Task WackTests_Prism_All_WPFAsync(string projectType, string framework, string platform, string language)
+        {
+            await RunWackOnProjectWithAllPagesAndFeaturesAsync(projectType, framework, platform, language);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetProjectTemplatesForBuild), Frameworks.MVVMToolkit, ProgrammingLanguages.CSharp, Platforms.Wpf)]
+        public async Task WackTests_MvvmToolkit_All_WPFAsync(string projectType, string framework, string platform, string language)
+        {
+            await RunWackOnProjectWithAllPagesAndFeaturesAsync(projectType, framework, platform, language);
+        }
 
         private async Task RunWackOnProjectWithAllPagesAndFeaturesAsync(string projectType, string framework, string platform, string language)
         {
-            Func<ITemplateInfo, bool> templateSelector =
-                t => t.GetTemplateType().IsItemTemplate()
+            bool templateSelector(ITemplateInfo t) => t.GetTemplateType().IsItemTemplate()
                 && (t.GetProjectTypeList().Contains(projectType) || t.GetProjectTypeList().Contains(All))
-                && t.GetFrontEndFrameworkList().Contains(framework) || t.GetFrontEndFrameworkList().Contains(All)
+                && (t.GetFrontEndFrameworkList().Contains(framework) || t.GetFrontEndFrameworkList().Contains(All))
                 && !t.GroupIdentity.StartsWith("wts.Wpf.Service.Identity")
+                && !t.GroupIdentity.Contains("Test")
+                && !t.GroupIdentity.Contains("WinAppDriver")
                 && t.GetPlatform() == platform
                 && !t.GetIsHidden();
 
@@ -72,7 +85,13 @@ namespace Microsoft.Templates.Test.Wack.Wpf
         {
             var projectName = $"{projectType}{framework}Wack{ShortLanguageName(language)}Wpf";
 
-            var projectPath = await AssertGenerateProjectAsync(projectName, projectType, framework, platform, language, templateSelector, GenerationFixture.GetDefaultName);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework
+            };
+
+            var projectPath = await AssertGenerateProjectAsync(projectName, context, templateSelector, GenerationFixture.GetDefaultName);
 
             // Replace the default assets in the generated project or they will cause WACK to fail
             foreach (var assetFile in new DirectoryInfo("../../TestData/NonDefaultAssets").GetFiles("*.png"))
@@ -84,9 +103,9 @@ namespace Microsoft.Templates.Test.Wack.Wpf
 
             // Create MSIXBundle
             // NOTE. This is very slow. (i.e. ~10+ mins) as it does a full release build including all .net native compilation
-            var bundleResult = _fixture.BuildMsixBundle(projectName, projectPath, packagingProjectName, "wapproj", "bat\\Wpf\\RestoreAndBuildAppx.bat");
+            var (exitCode, outputFile) = _fixture.BuildMsixBundle(projectName, projectPath, packagingProjectName, "wapproj", "bat\\Wpf\\RestoreAndBuildAppx.bat");
 
-            Assert.True(bundleResult.exitCode.Equals(0), $"Failed to create MsixBundle for {packagingProjectName}. {Environment.NewLine}Errors found: {_fixture.GetErrorLines(bundleResult.outputFile)}.{Environment.NewLine}Please see {Path.GetFullPath(bundleResult.outputFile)} for more details.");
+            Assert.True(exitCode.Equals(0), $"Failed to create MsixBundle for {packagingProjectName}. {Environment.NewLine}Errors found: {_fixture.GetErrorLines(outputFile)}.{Environment.NewLine}Please see {Path.GetFullPath(outputFile)} for more details.");
 
             var bundleFile = new DirectoryInfo(Path.Combine(projectPath, packagingProjectName, "AppPackages")).GetFiles("*.msixbundle", SearchOption.AllDirectories).First().FullName;
 

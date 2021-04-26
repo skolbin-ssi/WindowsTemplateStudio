@@ -28,6 +28,7 @@ namespace Microsoft.Templates.UI.Controls
     {
         None,
         NamingValidation,
+        ProjectPathValidation,
     }
 
     public enum Category
@@ -39,15 +40,15 @@ namespace Microsoft.Templates.UI.Controls
         RemoveTemplateValidation,
         RightClickItemHasNoChanges,
         ViewSufixValidation,
-        MissingSdk,
+        MissingVersion,
     }
 
     public class Notification : Observable
     {
+        private readonly DispatcherTimer _closeTimer;
         private bool _canClose;
         private string _message;
         private ICommand _closeCommand;
-        private DispatcherTimer _closeTimer;
 
         public NotificationType Type { get; private set; }
 

@@ -15,7 +15,7 @@
     "wts.frontendframework": "all",
     "wts.platform": "Wpf",
     "wts.version": "1.0.0",
-    "wts.displayOrder": "1",
+    "wts.displayOrder": "2",
     "wts.group": "UserInteraction",
     "wts.defaultInstance": "ThemeSelection",
     "wts.multipleInstance": "false",
@@ -34,12 +34,22 @@
     },
     {
       "path": "Services/ThemeSelectorService.cs"
+    },
+    {
+      "path": "Styles/Themes/HC.Dark.Blue.xaml"
+    },
+    {
+      "path": "Styles/Themes/HC.Light.Blue.xaml"
     }
   ],
   "symbols": {
     "wts.rootNamespace": {
       "type": "parameter",
       "replaces": "Param_RootNamespace"
+    },
+    "wts.projectName": {
+      "type": "parameter",
+      "replaces": "Param_ProjectName"
     }
   }
 }

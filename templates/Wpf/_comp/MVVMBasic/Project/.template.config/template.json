@@ -20,10 +20,16 @@
     "preferNameDirectory": true,
     "PrimaryOutputs": [
       {
+        "path": "Contracts/Activation/IActivationHandler.cs"
+      },
+      {
         "path": "Contracts/Services/INavigationService.cs"
       },
       {
         "path": "Contracts/Services/IPageService.cs"
+      },
+      {
+        "path": "Contracts/ViewModels/INavigationAware.cs"
       },
       {
         "path": "Helpers/FrameExtensions.cs"

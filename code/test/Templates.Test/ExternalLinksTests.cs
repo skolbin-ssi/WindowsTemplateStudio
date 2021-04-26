@@ -212,6 +212,7 @@ namespace Microsoft.Templates.Test
         public async Task CommentLinksAreCorrectAsync()
         {
             var filesWithBrokenLinks = new List<(string file, string uri, int statusCode)>();
+            var insideCommentBlock = false;
 
             // Just check C# files. A separate test verifies that VB & C# comments are the same.
             foreach (var file in GetFiles(TemplatesRoot, "*.cs"))
@@ -222,7 +223,13 @@ namespace Microsoft.Templates.Test
 
                 foreach (var line in fileContents)
                 {
-                    if (line.TrimStart().StartsWith("// ") && line.Contains("http"))
+                    if (line.TrimStart().StartsWith("/*"))
+                    {
+                        insideCommentBlock = true;
+                    }
+
+                    
+                    if ((line.TrimStart().StartsWith("// ") || insideCommentBlock) && line.Contains("http"))
                     {
                         var httpPos = line.IndexOf("http");
 
@@ -237,11 +244,18 @@ namespace Microsoft.Templates.Test
                             links.Add(line.Substring(httpPos));
                         }
                     }
+
+                    if (line.TrimEnd().EndsWith("*/"))
+                    {
+                        insideCommentBlock = false;
+                    }
                 }
 
                 foreach (var url in links)
                 {
-                    if (url == "https://YourPrivacyUrlGoesHere")
+                    // The login.microsoftonline address is from the SecureWebAPI code and calls to it may be affected by proxy settings
+                    if (url == "https://YourPrivacyUrlGoesHere"
+                     || url.StartsWith("https://login.microsoftonline.com/common/discovery/instance?authorization_endpoint=https"))
                     {
                         continue;
                     }

@@ -14,7 +14,7 @@
     "wts.outputToParent": "true",
     "wts.platform" : "Uwp",
     "wts.version": "1.0.0",
-    "wts.compositionFilter": "$frontendframework == MVVMBasic|MVVMLight|CodeBehind|CaliburnMicro & identity == wts.Testing.UnitTests.Core.xUnit & $page == wts.Page.Grid|wts.Page.Grid.CodeBehind|wts.Page.DataGrid|wts.Page.DataGrid.CodeBehind",
+    "wts.compositionFilter": "$frontendframework == MVVMBasic|MVVMLight|CodeBehind|CaliburnMicro|MVVMToolkit & identity == wts.Testing.UnitTests.Core.xUnit & $page == wts.Page.Grid|wts.Page.Grid.CodeBehind|wts.Page.DataGrid|wts.Page.DataGrid.CodeBehind",
     "wts.compositionOrder" : "1"
   },
   "sourceName": "wts.ItemName",
@@ -22,6 +22,11 @@
   "PrimaryOutputs": [
   ],
   "symbols": {
+    "wts.projectName": {
+      "type": "parameter",
+      "replaces": "Param_ProjectName",
+      "fileRename": "Param_ProjectName"
+    },
     "wts.rootNamespace": {
       "type": "parameter",
       "replaces": "Param_RootNamespace"

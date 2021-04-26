@@ -19,6 +19,7 @@ namespace Microsoft.Templates.UI.ViewModels.Common
         private string _icon;
         private int _order;
         private bool _isHidden;
+        private bool _deprecated;
         private RelayCommand _detailsCommand;
         private RelayCommand _goBackCommand;
 
@@ -76,6 +77,12 @@ namespace Microsoft.Templates.UI.ViewModels.Common
             set => SetProperty(ref _isHidden, value);
         }
 
+        public bool Deprecated
+        {
+            get => _deprecated;
+            set => SetProperty(ref _deprecated, value);
+        }
+
         public IEnumerable<BasicInfoViewModel> Dependencies { get; protected set; }
 
         public IEnumerable<BasicInfoViewModel> Requirements { get; protected set; }
@@ -83,6 +90,8 @@ namespace Microsoft.Templates.UI.ViewModels.Common
         public IEnumerable<BasicInfoViewModel> Exclusions { get; protected set; }
 
         public IEnumerable<string> RequiredSdks { get; protected set; }
+
+        public IEnumerable<string> RequiredDotNetVersion { get; protected set; }
 
         public IEnumerable<string> RequiredVisualStudioWorkloads { get; protected set; }
 

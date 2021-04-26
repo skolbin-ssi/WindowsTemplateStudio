@@ -6,14 +6,14 @@ Imports Windows.ApplicationModel.Core
 Imports Windows.UI.Core
 
 Namespace Services
-    ' For instructions on testing this service see https://github.com/Microsoft/WindowsTemplateStudio/blob/master/docs/UWP/features/whats-new-prompt.md
+    ' For instructions on testing this service see https://github.com/Microsoft/WindowsTemplateStudio/blob/release/docs/UWP/features/whats-new-prompt.md
     Public Module WhatsNewDisplayService
         Dim shown As Boolean = False
 
         Friend Async Function ShowIfAppropriateAsync() As Task
             Await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             Async Sub()
-                If SystemInformation.IsAppUpdated AndAlso Not shown Then
+                If SystemInformation.Instance.IsAppUpdated AndAlso Not shown Then
                     shown = True
                     Dim dialog = New WhatsNewDialog()
                     Await dialog.ShowAsync()

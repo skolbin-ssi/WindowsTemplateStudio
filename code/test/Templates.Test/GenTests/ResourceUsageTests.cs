@@ -21,15 +21,13 @@ namespace Microsoft.Templates.Test
     [Collection("GenerationCollection")]
     public class ResourceUsageTests : BaseGenAndBuildTests
     {
-        private readonly string _emptyBackendFramework = string.Empty;
-
         public ResourceUsageTests(GenerationFixture fixture)
             : base(fixture)
         {
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetCSharpUwpProjectTemplatesForGenerationAsync))]
+        [MemberData(nameof(BaseGenAndBuildTests.GetCSharpUwpProjectTemplatesForGeneration))]
         [Trait("ExecutionSet", "ManualOnly")]
         [Trait("Type", "GenerationResourceUsage")]
         public async Task EnsureReswResourceInGeneratedProjectsAreUsedAsync(string projectType, string framework, string platform, string language)
@@ -106,7 +104,7 @@ namespace Microsoft.Templates.Test
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetCSharpUwpProjectTemplatesForGenerationAsync))]
+        [MemberData(nameof(BaseGenAndBuildTests.GetCSharpUwpProjectTemplatesForGeneration))]
         [Trait("ExecutionSet", "ManualOnly")]
         [Trait("Type", "GenerationResourceUsage")]
         public async Task EnsureDefinedUidsHaveResourceEntriesAsync(string projectType, string framework, string platform, string language)
@@ -202,15 +200,23 @@ namespace Microsoft.Templates.Test
                 GenerationOutputPath = destinationPath,
             };
 
-            var userSelection = _fixture.SetupProject(projectType, framework, platform, language);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework,
+            };
+
+            var userSelection = _fixture.SetupProject(context);
 
             var templates = _fixture.Templates()
                 .Where(t => t.GetTemplateType().IsItemTemplate()
                 && t.GetFrontEndFrameworkList().Contains(framework)
                 && t.GetPlatform() == platform
+                && !excludedTemplates_Uwp_Group1.Contains(t.GroupIdentity)
+                && !excludedTemplatesGroup1VB.Contains(t.GroupIdentity)
                 && !t.GetIsHidden());
 
-            var templatesInfo = GenContext.ToolBox.Repo.GetTemplatesInfo(templates, platform, projectType, framework, _emptyBackendFramework);
+            var templatesInfo = GenContext.ToolBox.Repo.GetTemplatesInfo(templates, context);
 
             _fixture.AddItems(userSelection, templatesInfo, BaseGenAndBuildFixture.GetDefaultName);
 

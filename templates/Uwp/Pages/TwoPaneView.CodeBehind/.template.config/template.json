@@ -4,8 +4,8 @@
   "classifications": [
     "Universal"
   ],
-  "name": "Two Pane View",
-  "shortName": "Two Pane View",
+  "name": "TwoPaneView",
+  "shortName": "TwoPaneView",
   "groupIdentity": "wts.Page.TwoPaneView",
   "identity": "wts.Page.TwoPaneView.CodeBehind",
   "description": "Master-Detail page optimized for dual-screen devices.",
@@ -13,6 +13,7 @@
     "language": "C#",
     "type": "item",
     "wts.type": "page",
+    "wts.telemName": "Two Pane View",
     "wts.projecttype": "all",
     "wts.frontendframework": "CodeBehind",
     "wts.platform": "Uwp",
@@ -58,7 +59,7 @@
       "actionId": "0B814718-16A3-4F7F-89F1-69C0F9170EAD",
       "args": {
         "packageId" : "Microsoft.UI.Xaml",
-        "version" : "2.3.200213001",
+        "version" : "2.5.0",
         "projectPath": "Param_ProjectName.csproj"
       },
       "continueOnError": true
@@ -69,7 +70,7 @@
       "actionId": "0B814718-16A3-4F7F-89F1-69C0F9170EAD",
       "args": {
         "packageId" : "Microsoft.Toolkit.Uwp.UI.Controls",
-        "version" : "6.0.0",
+        "version" : "7.0.1",
         "projectPath": "Param_ProjectName.csproj"
       },
       "continueOnError": true

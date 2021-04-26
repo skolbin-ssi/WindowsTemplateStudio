@@ -12,7 +12,7 @@
     "type": "item",
     "wts.type": "service",
     "wts.projecttype": "all",
-    "wts.frontendframework": "MVVMBasic|MVVMLight|CodeBehind",
+    "wts.frontendframework": "MVVMBasic|MVVMLight|CodeBehind|MVVMToolkit",
     "wts.platform": "Uwp",
     "wts.group": "Data",
     "wts.version": "1.0.0",
@@ -51,7 +51,7 @@
       "actionId": "0B814718-16A3-4F7F-89F1-69C0F9170EAD",
       "args": {
         "packageId" : "Microsoft.EntityFrameworkCore.SqlServer",
-        "version" : "2.1.11",
+        "version" : "2.2.6",
         "projectPath": "Param_ProjectName.Core\\Param_ProjectName.Core.vbproj"
       },
       "continueOnError": true
@@ -62,7 +62,7 @@
       "actionId": "0B814718-16A3-4F7F-89F1-69C0F9170EAD",
       "args": {
         "packageId" : "Microsoft.EntityFrameworkCore",
-        "version" : "2.1.11",
+        "version" : "2.2.6",
         "projectPath": "Param_ProjectName.Core\\Param_ProjectName.Core.vbproj"
       },
       "continueOnError": true

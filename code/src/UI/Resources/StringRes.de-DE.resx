@@ -117,6 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessibilityEditPageItem" xml:space="preserve">
+    <value>Seitenname</value>
+    <comment>Edit page label to accessibility</comment>
+  </data>
+  <data name="AccessibilityProjectTypesList" xml:space="preserve">
+    <value>Projekttypen</value>
+    <comment>Project types list label to accessibility</comment>
+  </data>
+  <data name="AccessibilityDesignPatternList" xml:space="preserve">
+    <value>Design patterns</value>
+    <comment>Design pattern list to accessibility</comment>
+  </data>
+  <data name="NotificationRemoveError_ReadOnly" xml:space="preserve">
+    <value>Sie können **{0}** nicht entfernen, da es für den ausgewählten Projekttyp erforderlich ist.</value>
+    <comment>Remove error message: Template is read only</comment>
+  </data>
+  <data name="InfoDialogRequiredWorkloadNotFoundMessage" xml:space="preserve">
+    <value>Sie müssen die folgenden Workloads installieren, um ein {0} Projekt zu erstellen: {1}</value>
+  </data>
+  <data name="NotificationValidationError_ProjectNameAndPathDoNotMatch" xml:space="preserve">
+    <value>Der Projektname stimmt nicht mit dem Projektordnernamen überein. Bitte stellen Sie sich ein, um eine korrekte Generierung zu gewährleisten.</value>
+  </data>
+  <data name="NotificationMissingVersions" xml:space="preserve">
+    <value>Die folgenden Versionen fehlen, installieren Sie sie und starten Sie Visual Studio neu: {0}</value>
+  </data>
+  <data name="TemplateDetailsRequiredDotNetVersion" xml:space="preserve">
+    <value>Minimale .NET Core Version:</value>
+  </data>
+  <data name="ErrorInvalidRequirementType" xml:space="preserve">
+    <value>Ungültiger Anforderungstyp {0}</value>
+  </data>
   <data name="NewProjectTitleUWP" xml:space="preserve">
     <value>Neue Universal Windows Platform-App</value>
     <comment>Wizard title on WizardShell page for UWP projects</comment>
@@ -175,9 +206,6 @@
     <value>Fehler beim Hinzufügen von SDKs in Projekt {0}</value>
     <comment>Error message for adding items to project</comment>
   </data>
-  <data name="NotificationMissingSdk" xml:space="preserve">
-    <value>Erforderliche Windows SDKs für folgende Zielplattformen fehlen: {0}.  Bitte [installieren Sie sie](https://developer.microsoft.com/windows/downloads/windows-10-sdk) und starten Sie Visual Studio neu, bevor Sie fortfahren.</value>
-  </data>
   <data name="TemplateDetailsRequiredSdks" xml:space="preserve">
     <value>Erforderliche Windows SDKs:</value>
   </data>
@@ -196,18 +224,11 @@
   <data name="InfoDialogInvalidVersionTitle" xml:space="preserve">
     <value>Höhere Version erforderlich</value>
   </data>
-  <data name="InfoDialogInvalidVSVersionForWPF" xml:space="preserve">
-    <value>Für die Projekterstellung mit WPF with .NET Core ist Visual Studio 2019 Update 3 oder höher erforderlich.</value>
-    <comment>Error message for WPF .NET Core in VS2017</comment>
-  </data>
   <data name="InfoDialogMissingWorkloadTitle" xml:space="preserve">
     <value>Fehlender Workload</value>
   </data>
   <data name="InfoDialogMoreInfoLinkText" xml:space="preserve">
     <value>Weitere Informationen</value>
-  </data>
-  <data name="InfoDialogRequiredWorkloadNotFoundMessage" xml:space="preserve">
-    <value>Sie müssen Workload „{0}“ installieren, um ein {1}-Projekt erstellen zu können. Installieren Sie diesen Workload über den Visual Studio Installer.</value>
   </data>
   <data name="UWP" xml:space="preserve">
     <value>UWP</value>
@@ -692,17 +713,9 @@
     <value>Benachrichtigungsbereich</value>
     <comment> Notification panel label to accessibility</comment>
   </data>
-  <data name="AccessibilityEditPageItem" xml:space="preserve">
-    <value>Seite bearbeiten</value>
-    <comment>Edit page label to accessibility</comment>
-  </data>
   <data name="AccessibilityNavigationMenu" xml:space="preserve">
     <value>Navigationsmenü</value>
     <comment>Navigation menu label</comment>
-  </data>
-  <data name="AccessibilityProjectTypesList" xml:space="preserve">
-    <value>Liste der Projekttypen</value>
-    <comment>Project types list label to accessibility</comment>
   </data>
   <data name="AccessibilitySequentialFlowControl" xml:space="preserve">
     <value>Sequenzielle Ablaufsteuerung</value>
@@ -711,10 +724,6 @@
   <data name="AccessibilityUserSelectionPageList" xml:space="preserve">
     <value>Benutzerauswahlseiten</value>
     <comment>User selection page list to accessibility</comment>
-  </data>
-  <data name="AccessibilityDesignPatternList" xml:space="preserve">
-    <value>Design patternliste</value>
-    <comment>Design pattern list to accessibility</comment>
   </data>
   <data name="AccessibilityTemplatesList" xml:space="preserve">
     <value>Vorlagenliste</value>
@@ -854,10 +863,6 @@
     <value>Windows Template Studio fügt nun ein Kernprojekt hinzu. </value>
     <comment>Has no core project validation error message</comment>
   </data>
-  <data name="NotificationRemoveError_ReadOnly" xml:space="preserve">
-    <value>Sie können **{0}** nicht entfernen, da dieses Element schreibgeschützt ist.</value>
-    <comment>Remove error message: Template is read only</comment>
-  </data>
   <data name="TemplateDetailsLayout" xml:space="preserve">
     <value>Layout:</value>
     <comment>Template details: Layout</comment>
@@ -888,5 +893,29 @@
   <data name="ValidatorHasActivationServiceBeforeIdentityLinkMessage" xml:space="preserve">
     <value>Siehe die zu aktualisierende Dokumentation.</value>
     <comment>Has ActivationService before Identity link documentation message</comment>
+  </data>
+  <data name="NewProjectTitleWinUIDesktop" xml:space="preserve">
+    <value>New WinUI3 Desktop app</value>
+  </data>
+  <data name="NewProjectTitleWinUIUWP" xml:space="preserve">
+    <value>New WinUI3 UWP app</value>
+  </data>
+  <data name="WinUI" xml:space="preserve">
+    <value>Windows UI</value>
+  </data>
+  <data name="DeprecatedMessage" xml:space="preserve">
+    <value>Veraltet</value>
+    <comment>Text used to indicate a deprecated option in the wizard</comment>
+  </data>
+  <data name="ErrorUnableToOpenProjectOverview" xml:space="preserve">
+    <value>Die Projektübersicht konnte nicht geöffnet werden.</value>
+    <comment>Error message for unable to open project overview dialog</comment>
+  </data>
+  <data name="ProjectConfigurationSelectAppModel" xml:space="preserve">
+    <value>Select AppModel</value>
+  </data>
+  <data name="InfoDialogInvalidVSVersion" xml:space="preserve">
+    <value>{0} Projekterstellung erfordert Visual Studio 2019 Version {1} oder höher.</value>
+    <comment>Error message for Invalid VS Version</comment>
   </data>
 </root>

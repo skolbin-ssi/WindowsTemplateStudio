@@ -15,7 +15,7 @@ namespace Param_RootNamespace.ViewModels
 
         private string _source;
         private bool _isLoading = true;
-        private bool _isShowingFailedMessage = false;
+        private bool _isShowingFailedMessage;
         private Visibility _isLoadingVisibility = Visibility.Visible;
         private Visibility _failedMesageVisibility = Visibility.Collapsed;
         private ICommand _refreshCommand;
@@ -86,7 +86,7 @@ namespace Param_RootNamespace.ViewModels
             IsLoading = false;
             if (e != null && !e.IsSuccess)
             {
-                // Use `args.WebErrorStatus` to vary the displayed message based on the error reason
+                // Use `e.WebErrorStatus` to vary the displayed message based on the error reason
                 IsShowingFailedMessage = true;
             }
         }

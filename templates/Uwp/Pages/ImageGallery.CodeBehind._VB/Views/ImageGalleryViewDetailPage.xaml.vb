@@ -19,7 +19,7 @@ Namespace Views
             End Get
             Set
                 [Param_Setter](_selectedImage, value)
-                ImagesNavigationHelper.UpdateImageId(ImageGalleryViewPage.ImageGalleryViewSelectedIdKey, DirectCast(SelectedImage, SampleImage).ID)
+                ImagesNavigationHelper.UpdateImageId(ImageGalleryViewPage.ImageGalleryViewSelectedIdKey, DirectCast(SelectedImage, SampleImage)?.ID)
             End Set
         End Property
 
@@ -33,7 +33,7 @@ Namespace Views
             MyBase.OnNavigatedTo(e)
             Source.Clear()
 
-            ' TODO WTS: Replace this with your actual data
+            ' Replace this with your actual data
             Dim data = Await SampleDataService.GetImageGalleryDataAsync("ms-appx:///Assets")
             For Each item As SampleImage In data
                 Source.Add(item)

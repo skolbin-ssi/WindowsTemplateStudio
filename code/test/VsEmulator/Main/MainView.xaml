@@ -7,11 +7,12 @@
         mc:Ignorable="d"
         KeyDown="OnKeyDown"
         Title="Visual Studio Emulator" 
-        Height="600" Width="1200" 
+        Height="750" Width="1400" 
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
     </Window.Resources>
 
     <Grid>
@@ -33,6 +34,7 @@
                 </Grid.RowDefinitions>
                 <Grid Margin="12,12,12,12">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
@@ -73,7 +75,7 @@
                     <StackPanel Grid.Column="1">
                         <TextBlock Text="Windows Presentation Foundation" FontWeight="Bold" FontSize="12" />
                         <TextBlock Margin="0,6,0,0">
-                            <Hyperlink x:Name="newCSharpWpfProjectButton" Command="{Binding NewProjectCommand}" CommandParameter="Wpf,C#">
+                            <Hyperlink Command="{Binding NewProjectCommand}" CommandParameter="Wpf,C#">
                                 <TextBlock Text="New project C#"/>
                             </Hyperlink>
                         </TextBlock>
@@ -94,6 +96,44 @@
                         </TextBlock>
                     </StackPanel>
                     <StackPanel Grid.Column="2">
+                        <TextBlock Text="WinUI" FontWeight="Bold" FontSize="12" />
+                        <TextBlock Margin="0,6,0,0">
+                            <Hyperlink Command="{Binding NewProjectCommand}" CommandParameter="WinUI,C#,Desktop">
+                                <TextBlock Text="New project C# (Desktop)"/>
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Margin="0,6,0,0">
+                            <Hyperlink Command="{Binding NewProjectCommand}" CommandParameter="WinUI,C#,Uwp">
+                                <TextBlock Text="New project C# (Uwp)"/>
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Margin="0,6,0,0">
+                            <Hyperlink Command="{Binding NewProjectCommand}" CommandParameter="WinUI,C++,Desktop">
+                                <TextBlock Text="New project C++ (Desktop)"/>
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Margin="0,6,0,0">
+                            <Hyperlink Command="{Binding NewProjectCommand}" CommandParameter="WinUI,C++,Uwp">
+                                <TextBlock Text="New project C++ (Uwp)"/>
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Margin="0,12,0,0">
+                            <Hyperlink Command="{Binding AnalyzeSelectionCommand}" CommandParameter="WinUI,C#,Desktop">
+                                <TextBlock Text="Analyze C# (Desktop)"/>
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Margin="0,12,0,0">
+                            <Hyperlink Command="{Binding LoadProjectCommand}">
+                                <TextBlock Text="Load project..."/>
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Margin="0,12,0,0">
+                            <Hyperlink Command="{Binding RecreateWinUIProjectCommand}">
+                                <TextBlock Text="Re-create last user selection"/>
+                            </Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3">
                         <TextBlock Text="Generation options" FontWeight="Bold" FontSize="12" />
                         <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
                             <CheckBox IsChecked="{Binding UseStyleCop, Mode=TwoWay}" VerticalAlignment="Center" />
@@ -120,7 +160,7 @@
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="1" Style="{StaticResource HorizontalSeparator}" />
-                <ScrollViewer x:Name="logScroll" Margin="0,8" Padding="12,0" Grid.Row="2">
+                <ScrollViewer Margin="0,8" Padding="12,0" Grid.Row="2">
                     <TextBlock Text="{Binding Log}" TextWrapping="Wrap" />
                 </ScrollViewer>
             </Grid>
@@ -136,6 +176,10 @@
                                 <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
                                     <TextBlock Text="Platform: " Style="{StaticResource Label1}" />
                                     <TextBlock Text="{Binding Platform}" Style="{StaticResource Label1}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0" Visibility="{Binding AppModel, Converter={StaticResource StringToVisibilityConverter}}">
+                                    <TextBlock Text="App Model: " Style="{StaticResource Label1}" />
+                                    <TextBlock Text="{Binding AppModel}" Style="{StaticResource Label1}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                                     <TextBlock Text="Language: " Style="{StaticResource Label1}" />
@@ -153,7 +197,7 @@
                                     <TextBlock Text="Time: " Style="{StaticResource Label1}" />
                                     <TextBlock Text="{Binding Time}" Style="{StaticResource Label1}" />
                                 </StackPanel>
-                                <TextBlock Margin="0,4,0,0" Text="Generated with style checks" Style="{StaticResource Label1}" Visibility="{Binding StyleCopTextVisibility}" />
+                                <TextBlock Margin="0,4,0,0" Text="Generated with style checks" Style="{StaticResource Label1}" Visibility="{Binding UseStyleCop, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                                 <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
                                     <Button Command="{Binding OpenInVsCommand}" Style="{StaticResource IconButton}">

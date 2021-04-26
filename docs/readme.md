@@ -8,6 +8,8 @@ Everyone should read these.
 
 - [Installing the extension](./getting-started-extension.md)
 - [Core concepts](./concepts.md)
+- [How to create a new app and add new pages/features](./how-to.md)
+- [3rd party libraries updates and breaking changes](./third-party-libraries.md)
 
 ## Using WinTS to build apps
 
@@ -24,7 +26,7 @@ These will help if using WinTS to build apps.
 
 - [Using and extending the generated WPF app](./WPF/getting-started-endusers.md)
 - [Using MahApps.Metro](./WPF/mahapps-metro.md)
-- [Adapt the app for specific platforms](./UWP/platform-specific-recommendations.md)
+- [Adapt the app for specific platforms](./WPF/platform-specific-recommendations.md)
 
 ## Working on WinTS
 

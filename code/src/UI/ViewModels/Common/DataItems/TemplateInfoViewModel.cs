@@ -21,7 +21,6 @@ namespace Microsoft.Templates.UI.ViewModels.Common
         private bool _canBeAdded;
         private bool _disabled;
         private string _disabledMessage;
-        private string _emptyBackendFramework = string.Empty;
 
         public TemplateInfo Template { get; }
 
@@ -89,7 +88,7 @@ namespace Microsoft.Templates.UI.ViewModels.Common
             set => SetProperty(ref _disabledMessage, value);
         }
 
-        public TemplateInfoViewModel(TemplateInfo template,  string platform, string projectType, string frameworkName)
+        public TemplateInfoViewModel(TemplateInfo template,  UserSelectionContext context)
         {
             // BasicInfo properties
             Name = template.Name;
@@ -103,12 +102,15 @@ namespace Microsoft.Templates.UI.ViewModels.Common
             Order = template.DisplayOrder;
             IsHidden = template.IsHidden;
             DefaultName = template.DefaultName;
-            Dependencies = template.Dependencies.Select(d => new TemplateInfoViewModel(d, platform, projectType, frameworkName));
-            Requirements = template.Requirements.Select(d => new TemplateInfoViewModel(d, platform, projectType, frameworkName));
-            Exclusions = template.Exclusions.Select(d => new TemplateInfoViewModel(d, platform, projectType, frameworkName));
-            RequiredSdks = template.RequiredSdks.Select(sdk => Regex.Match(sdk, @"\d+(\.\d+)+").Value);
+            Dependencies = template.Dependencies.Select(d => new TemplateInfoViewModel(d, context));
+            Requirements = template.Requirements.Select(d => new TemplateInfoViewModel(d, context));
+            Exclusions = template.Exclusions.Select(d => new TemplateInfoViewModel(d, context));
             RequiredVisualStudioWorkloads = template.RequiredVisualStudioWorkloads.Select(r => r.GetRequiredWorkloadDisplayName());
             Licenses = template.Licenses.Select(l => new LicenseViewModel(l));
+
+            var requiredVersions = template.RequiredVersions.Select(s => RequiredVersionService.GetVersionInfo(s));
+            RequiredSdks = requiredVersions.Where(s => s.RequirementType == RequirementType.WindowsSDK).Select(s => s.Version.ToString());
+            RequiredDotNetVersion = requiredVersions.Where(s => s.RequirementType == RequirementType.DotNetRuntime).Select(s => s.Version.ToString());
 
             // ITemplateInfo properties
             Template = template;

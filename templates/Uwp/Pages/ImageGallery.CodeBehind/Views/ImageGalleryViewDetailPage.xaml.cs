@@ -28,7 +28,7 @@ namespace Param_RootNamespace.Views
             set
             {
                 Param_Setter(ref _selectedImage, value);
-                ImagesNavigationHelper.UpdateImageId(ImageGalleryViewPage.ImageGalleryViewSelectedIdKey, ((SampleImage)SelectedImage).ID);
+                ImagesNavigationHelper.UpdateImageId(ImageGalleryViewPage.ImageGalleryViewSelectedIdKey, ((SampleImage)SelectedImage)?.ID);
             }
         }
 
@@ -44,7 +44,7 @@ namespace Param_RootNamespace.Views
             base.OnNavigatedTo(e);
             Source.Clear();
 
-            // TODO WTS: Replace this with your actual data
+            // Replace this with your actual data
             var data = await SampleDataService.GetImageGalleryDataAsync("ms-appx:///Assets");
 
             foreach (var item in data)

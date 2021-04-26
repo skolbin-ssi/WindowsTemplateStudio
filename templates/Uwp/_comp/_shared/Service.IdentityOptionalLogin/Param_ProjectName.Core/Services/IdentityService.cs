@@ -11,15 +11,17 @@ namespace Param_RootNamespace.Core.Services
     public class IdentityService
     {
         // For more information about using Identity, see
-        // https://github.com/Microsoft/WindowsTemplateStudio/blob/master/docs/UWP/services/identity.md
+        // https://github.com/Microsoft/WindowsTemplateStudio/blob/release/docs/UWP/services/identity.md
         //
         // Read more about Microsoft Identity Client here
         // https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki
         // https://docs.microsoft.com/azure/active-directory/develop/v2-overview
 
-        // WTS TODO: Please create a ClientID following these steps and update the app.config IdentityClientId.
+        // TODO WTS: Please create a ClientID following these steps and update the app.config IdentityClientId.
         // https://docs.microsoft.com/azure/active-directory/develop/quickstart-register-app
         private readonly string _clientId = ConfigurationManager.AppSettings["IdentityClientId"];
+
+        private readonly string _redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient";
 
         private readonly string[] _graphScopes = new string[] { "user.read" };
 
@@ -36,6 +38,16 @@ namespace Param_RootNamespace.Core.Services
             _integratedAuthAvailable = false;
             _client = PublicClientApplicationBuilder.Create(_clientId)
                                                     .WithAuthority(AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
+                                                    .WithRedirectUri(_redirectUri)
+                                                    .Build();
+        }
+
+        public void InitializeWithPersonalMsAccount()
+        {
+            _integratedAuthAvailable = false;
+            _client = PublicClientApplicationBuilder.Create(_clientId)
+                                                    .WithAuthority(AadAuthorityAudience.PersonalMicrosoftAccount)
+                                                    .WithRedirectUri(_redirectUri)
                                                     .Build();
         }
 
@@ -44,6 +56,7 @@ namespace Param_RootNamespace.Core.Services
             _integratedAuthAvailable = integratedAuth;
             _client = PublicClientApplicationBuilder.Create(_clientId)
                                                     .WithAuthority(AadAuthorityAudience.AzureAdMultipleOrgs)
+                                                    .WithRedirectUri(_redirectUri)
                                                     .Build();
         }
 
@@ -52,6 +65,7 @@ namespace Param_RootNamespace.Core.Services
             _integratedAuthAvailable = integratedAuth;
             _client = PublicClientApplicationBuilder.Create(_clientId)
                                                     .WithAuthority(AzureCloudInstance.AzurePublic, tenant)
+                                                    .WithRedirectUri(_redirectUri)
                                                     .Build();
         }
 

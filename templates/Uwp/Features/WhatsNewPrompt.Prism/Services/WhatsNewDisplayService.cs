@@ -7,7 +7,7 @@ using Param_RootNamespace.Views;
 
 namespace Param_RootNamespace.Services
 {
-    // For instructions on testing this service see https://github.com/Microsoft/WindowsTemplateStudio/blob/master/docs/UWP/features/whats-new-prompt.md
+    // For instructions on testing this service see https://github.com/Microsoft/WindowsTemplateStudio/blob/release/docs/UWP/features/whats-new-prompt.md
     public class WhatsNewDisplayService : IWhatsNewDisplayService
     {
         private static bool shown = false;
@@ -17,7 +17,7 @@ namespace Param_RootNamespace.Services
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
                 CoreDispatcherPriority.Normal, async () =>
                 {
-                    if (SystemInformation.IsAppUpdated && !shown)
+                    if (SystemInformation.Instance.IsAppUpdated && !shown)
                     {
                         shown = true;
                         var dialog = new WhatsNewDialog();

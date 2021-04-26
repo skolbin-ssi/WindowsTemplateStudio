@@ -1,10 +1,13 @@
-﻿using Param_RootNamespace.Models;
+﻿using System;
+using Param_RootNamespace.Models;
 
 namespace Param_RootNamespace.Contracts.Services
 {
     public interface IThemeSelectorService
     {
-        bool SetTheme(AppTheme? theme = null);
+        void InitializeTheme();
+
+        void SetTheme(AppTheme theme);
 
         AppTheme GetCurrentTheme();
     }

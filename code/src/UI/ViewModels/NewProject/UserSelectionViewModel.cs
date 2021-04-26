@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.UI;
 using Microsoft.Templates.Core;
 using Microsoft.Templates.Core.Diagnostics;
 using Microsoft.Templates.Core.Gen;
@@ -28,11 +29,7 @@ namespace Microsoft.Templates.UI.ViewModels.NewProject
     public class UserSelectionViewModel : Observable
     {
         private bool _isInitialized;
-        private string _projectTypeName;
-        private string _frameworkName;
-        private string _platform;
-        private string _language;
-        private string _emptyBackendFramework = string.Empty;
+        private UserSelectionContext _context;
 
         public ObservableCollection<LicenseViewModel> Licenses { get; } = new ObservableCollection<LicenseViewModel>();
 
@@ -48,18 +45,21 @@ namespace Microsoft.Templates.UI.ViewModels.NewProject
             Groups.Add(new UserSelectionGroup(TemplateType.Testing, StringRes.ProjectDetailsTestingSectionTitle));
         }
 
-        public async Task InitializeAsync(string projectTypeName, string frameworkName, string platform, string language)
+        public void Initialize(UserSelectionContext context)
         {
-            _projectTypeName = projectTypeName;
-            _frameworkName = frameworkName;
-            _platform = platform;
-            _language = language;
+            _context = context;
+
             if (_isInitialized)
             {
                 Groups.ToList().ForEach(g => g.Clear());
             }
 
-            var layout = GenContext.ToolBox.Repo.GetLayoutTemplates(platform, projectTypeName, frameworkName, _emptyBackendFramework);
+            _isInitialized = true;
+        }
+
+        public async Task AddLayoutTemplatesAsync()
+        {
+            var layout = GenContext.ToolBox.Repo.GetLayoutTemplates(_context);
             foreach (var item in layout)
             {
                 if (item.Template != null)
@@ -71,8 +71,6 @@ namespace Microsoft.Templates.UI.ViewModels.NewProject
                     }
                 }
             }
-
-            _isInitialized = true;
         }
 
         public void UnsubscribeEventHandlers()
@@ -127,7 +125,7 @@ namespace Microsoft.Templates.UI.ViewModels.NewProject
                 if (dependencyTemplate == null)
                 {
                     // Case of hidden templates, it's not found on templat lists
-                    dependencyTemplate = new TemplateInfoViewModel(dependency, _platform, _projectTypeName, _frameworkName);
+                    dependencyTemplate = new TemplateInfoViewModel(dependency, _context);
                 }
 
                 await AddAsync(templateOrigin, dependencyTemplate);
@@ -158,7 +156,7 @@ namespace Microsoft.Templates.UI.ViewModels.NewProject
                 AddToGroup(template.TemplateType, savedTemplate);
                 UpdateHasItemsAddedByUser();
                 BuildLicenses();
-                CheckForMissingSdks();
+                CheckForMissingVersions();
 
                 if (focus)
                 {
@@ -178,10 +176,10 @@ namespace Microsoft.Templates.UI.ViewModels.NewProject
 
         public UserSelection GetUserSelection()
         {
-            var selection = new UserSelection(_projectTypeName, _frameworkName, _emptyBackendFramework, _platform, _language);
+            var selection = new UserSelection(_context);
 
             var pages = Groups.First(g => g.TemplateType == TemplateType.Page).Items;
-            selection.HomeName = pages.First().Name;
+            selection.HomeName = pages.FirstOrDefault()?.Name ?? string.Empty;
             selection.Pages.AddRange(pages.Select(i => i.ToUserSelectionItem()));
 
             var features = Groups.First(g => g.TemplateType == TemplateType.Feature).Items;
@@ -261,20 +259,31 @@ namespace Microsoft.Templates.UI.ViewModels.NewProject
             OnPropertyChanged(nameof(Licenses));
         }
 
-        private void CheckForMissingSdks()
+        private void CheckForMissingVersions()
         {
-            var sdks = GenComposer.GetAllRequiredSdks(GetUserSelection());
+            var requiredVersions = GenComposer.GetAllRequiredVersions(GetUserSelection());
+            var missingVersions = new List<RequiredVersionInfo>();
 
-            var missingSdks = sdks.Where(sdk => !GenContext.ToolBox.Shell.IsSdkInstalled(sdk)).Select(sdk => Regex.Match(sdk, @"\d+(\.\d+)+").Value);
-
-            if (missingSdks.Any())
+            foreach (var requiredVersion in requiredVersions)
             {
-                var notification = Notification.Warning(string.Format(StringRes.NotificationMissingSdk, missingSdks.Aggregate((i, j) => $"{i},{j}")), Category.MissingSdk, TimerType.None);
+                var requirementInfo = RequiredVersionService.GetVersionInfo(requiredVersion);
+                var isInstalled = RequiredVersionService.Instance.IsVersionInstalled(requirementInfo);
+                if (!isInstalled)
+                {
+                    missingVersions.Add(requirementInfo);
+                }
+            }
+
+            if (missingVersions.Any())
+            {
+                var missingSdkVersions = missingVersions.Select(v => RequiredVersionService.GetRequirementDisplayName(v));
+
+                var notification = Notification.Warning(string.Format(StringRes.NotificationMissingVersions, missingSdkVersions.Aggregate((i, j) => $"{i}, {j}")), Category.MissingVersion, TimerType.None);
                 NotificationsControl.AddNotificationAsync(notification).FireAndForget();
             }
             else
             {
-                NotificationsControl.CleanCategoryNotificationsAsync(Category.MissingSdk).FireAndForget();
+                NotificationsControl.CleanCategoryNotificationsAsync(Category.MissingVersion).FireAndForget();
             }
         }
 
@@ -303,7 +312,7 @@ namespace Microsoft.Templates.UI.ViewModels.NewProject
                 UpdateHasItemsAddedByUser();
 
                 BuildLicenses();
-                CheckForMissingSdks();
+                CheckForMissingVersions();
 
                 AppHealth.Current.Telemetry.TrackEditSummaryItemAsync(EditItemActionEnum.Remove).FireAndForget();
             }

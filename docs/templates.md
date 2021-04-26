@@ -15,7 +15,7 @@ Do you want to contribute? Here are our [contribution guidelines](../CONTRIBUTIN
 
 ## Anatomy of Templates and Template Authoring
 
-For more info about how templates work see [Core Template Studio](https://github.com/microsoft/CoreTemplateStudio/tree/dev/docs/tenmplates.md)
+For more info about how templates work see [Core Template Studio](https://github.com/microsoft/CoreTemplateStudio/tree/dev/docs/templates.md)
 
 ## Templates repository structure
 
@@ -50,9 +50,8 @@ The script [List-CSharp-Templates-Without-VisualBasic-Equivalents.ps1](https://g
 
 It is assumed that non-code files used by different language versions of the same template will be identical. If one needs to be modified, change the one in the C# template and then run the script [Synchronize-Files-Used-By-VisualBasic-Templates.ps1](https://github.com/Microsoft/WindowsTemplateStudio/blob/dev/_utils/Synchronize-Files-Used-By-VisualBasic-Templates.ps1) and this will copy the file to the equivalent VB locations.
 
-Additionally, there is an automated test called `EnsureProjectsGeneratedWithDifferentLanguagesAreEquivalentAsync` that will generate an app using both language versions of supported templates and then use reflection of the generated apps to check for differences.
+Additionally, there are automated test called `EnsureProjectsGeneratedWithDifferentLanguagesAreEquivalent_G1_Async` and `EnsureProjectsGeneratedWithDifferentLanguagesAreEquivalent_G2_Async` that will generate an app using both language versions of supported templates and then use reflection of the generated apps to check for differences.
 
-Because AppVeyor does not support building VB apps, this test must be run manually. When testing VB versions of templates you should also run the test `GenerateAllPagesAndFeaturesAndCheckWithVBStyleAsync` which also must be run manually.
 
 ## Testing and verifying template contents
 
@@ -104,7 +103,7 @@ There are also code snippets to add Tags, PrimaryOutputs, Symbols and Post Actio
 ## Learn more
 
 - [Getting started with the WinTS codebase](./getting-started-developers.md)
-- [Templates doc in Core Template Studio](https://github.com/microsoft/CoreTemplateStudio/tree/dev/docs/tenmplates.md)
+- [Templates doc in Core Template Studio](https://github.com/microsoft/CoreTemplateStudio/tree/dev/docs/templates.md)
 - [Recording usage Telemetry](./telemetry.md)
 - [Ensuring generated code is accessible](./accessibility.md)
 - [All docs](./readme.md)

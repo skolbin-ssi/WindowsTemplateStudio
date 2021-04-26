@@ -1,10 +1,4 @@
-﻿Imports System
-Imports System.ComponentModel
-Imports System.Runtime.CompilerServices
-Imports Windows.System
-Imports Windows.UI.Xaml
-Imports Windows.UI.Xaml.Controls
-Imports Windows.UI.Xaml.Input
+﻿Imports Windows.System
 Imports Param_RootNamespace.Helpers
 Imports Param_RootNamespace.Services
 
@@ -12,7 +6,7 @@ Namespace Views
     ' TODO WTS: You can edit the text for the menu in String/en-US/Resources.resw
     ' You can show pages in different ways (update main view, navigate, right pane, new windows or dialog) using MenuNavigationHelper class.
     ' Read more about MenuBar project type here:
-    ' https://github.com/Microsoft/WindowsTemplateStudio/blob/master/docs/UWP/projectTypes/menubar.md
+    ' https://github.com/Microsoft/WindowsTemplateStudio/blob/release/docs/UWP/projectTypes/menubar.md
     Public NotInheritable Partial Class ShellPage
         Inherits Page
         Implements INotifyPropertyChanged

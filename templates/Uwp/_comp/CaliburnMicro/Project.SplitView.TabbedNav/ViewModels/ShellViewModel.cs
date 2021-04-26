@@ -73,12 +73,21 @@ namespace Param_RootNamespace.ViewModels
 
         private void OnItemInvoked(WinUI.NavigationViewItemInvokedEventArgs args)
         {
-            var item = _navigationView.MenuItems
-                            .OfType<WinUI.NavigationViewItem>()
-                            .First(menuItem => (string)menuItem.Content == (string)args.InvokedItem);
-            var pageType = item.GetValue(NavHelper.NavigateToProperty) as Type;
-            var viewModelType = ViewModelLocator.LocateTypeForViewType(pageType, false);
-            _navigationService.NavigateToViewModel(viewModelType);
+            if (args.IsSettingsInvoked)
+            {
+                // Navigate to the settings page - implement as appropriate if needed
+            }
+            else
+            {
+                var selectedItem = args.InvokedItemContainer as WinUI.NavigationViewItem;
+                var pageType = selectedItem?.GetValue(NavHelper.NavigateToProperty) as Type;
+
+                if (pageType != null)
+                {
+                    var viewModelType = ViewModelLocator.LocateTypeForViewType(pageType, false);
+                    _navigationService.NavigateToViewModel(viewModelType);
+                }
+            }
         }
 
         private void OnBackRequested(WinUI.NavigationView sender, WinUI.NavigationViewBackRequestedEventArgs args)
@@ -89,17 +98,43 @@ namespace Param_RootNamespace.ViewModels
         private void NavigationService_Navigated(object sender, NavigationEventArgs e)
         {
             IsBackEnabled = _navigationService.CanGoBack;
-            Selected = _navigationView.MenuItems
-                            .OfType<WinUI.NavigationViewItem>()
-                            .FirstOrDefault(menuItem => IsMenuItemForPageType(menuItem, e.SourcePageType));
+            var selectedItem = GetSelectedItem(_navigationView.MenuItems, e.SourcePageType);
+            if (selectedItem != null)
+            {
+                Selected = selectedItem;
+            }
+        }
+
+        private WinUI.NavigationViewItem GetSelectedItem(IEnumerable<object> menuItems, Type pageType)
+        {
+            foreach (var item in menuItems.OfType<WinUI.NavigationViewItem>())
+            {
+                if (IsMenuItemForPageType(item, pageType))
+                {
+                    return item;
+                }
+
+                var selectedChild = GetSelectedItem(item.MenuItems, pageType);
+                if (selectedChild != null)
+                {
+                    return selectedChild;
+                }
+            }
+
+            return null;
         }
 
         private bool IsMenuItemForPageType(WinUI.NavigationViewItem menuItem, Type sourcePageType)
         {
             var sourceViewModelType = ViewModelLocator.LocateTypeForViewType(sourcePageType, false);
             var pageType = menuItem.GetValue(NavHelper.NavigateToProperty) as Type;
-            var viewModelType = ViewModelLocator.LocateTypeForViewType(pageType, false);
-            return viewModelType == sourceViewModelType;
+            if (pageType != null)
+            {
+                var viewModelType = ViewModelLocator.LocateTypeForViewType(pageType, false);
+                return viewModelType == sourceViewModelType;
+            }
+
+            return false;
         }
 
         private static KeyboardAccelerator BuildKeyboardAccelerator(VirtualKey key, VirtualKeyModifiers? modifiers = null)

@@ -10,10 +10,12 @@
     xmlns:behaviors="clr-namespace:Param_RootNamespace.Behaviors"
     xmlns:Fluent="urn:fluent-ribbon"
     ShowSystemMenuOnRightClick="False"
-    Loaded="MetroWindow_Loaded"
-    Unloaded="MetroWindow_Unloaded"
+    Loaded="OnLoaded"
+    Unloaded="OnUnloaded"
     Style="{StaticResource CustomMetroWindow}"
     mc:Ignorable="d"
+    MinWidth="500"
+    MinHeight="350"
     Title="{x:Static properties:Resources.AppDisplayName}">
     <controls:MetroWindow.TitleTemplate>
         <DataTemplate>
@@ -37,6 +39,10 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <!--
+            Learn more about using Fluent.Ribbon Control at
+            https://fluentribbon.github.io/
+            -->
             <Fluent:Ribbon x:Name="ribbonControl" Grid.Row="0">
                 <!--Backstage-->
                 <Fluent:Ribbon.Menu>

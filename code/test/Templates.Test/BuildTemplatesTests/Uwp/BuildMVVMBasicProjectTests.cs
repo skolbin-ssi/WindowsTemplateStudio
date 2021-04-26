@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.Templates.Core;
 using Microsoft.Templates.Core.Extensions;
+using Microsoft.Templates.Core.Gen;
 using Xunit;
 
 namespace Microsoft.Templates.Test.Build.Uwp
@@ -16,35 +17,40 @@ namespace Microsoft.Templates.Test.Build.Uwp
     public class BuildMVVMBasicProjectTests : BaseGenAndBuildTests
     {
         public BuildMVVMBasicProjectTests(BuildTemplatesTestFixture fixture)
-            : base(fixture, null, "MVVMBasic")
+            : base(fixture, null, Frameworks.MVVMBasic)
         {
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), "MVVMBasic", "", Platforms.Uwp)]
+        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), Frameworks.MVVMBasic, "", Platforms.Uwp)]
         [Trait("ExecutionSet", "BuildMVVMBasic")]
         [Trait("ExecutionSet", "_Full")]
         [Trait("Type", "BuildProjects")]
-        public async Task Build_EmptyProject_InferConfig_Uwp(string projectType, string framework, string platform, string language)
+        public async Task Build_EmptyProject_InferConfig_UwpAsync(string projectType, string framework, string platform, string language)
         {
-            var (projectName, projectPath) = await GenerateEmptyProjectAsync(projectType, framework, platform, language);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework
+            };
+
+            var (projectName, projectPath) = await GenerateEmptyProjectAsync(context);
 
             // Don't delete after build test as used in inference test, which will then delete.
-            AssertBuildProjectAsync(projectPath, projectName, platform, deleteAfterBuild: false);
+            AssertBuildProject(projectPath, projectName, platform, deleteAfterBuild: false);
 
-            EnsureCanInferConfigInfo(projectType, framework, platform, projectPath);
+            EnsureCanInferConfigInfo(context, projectPath);
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), "MVVMBasic", "", Platforms.Uwp)]
+        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), Frameworks.MVVMBasic, "", Platforms.Uwp)]
         [Trait("ExecutionSet", "BuildMVVMBasic")]
         [Trait("ExecutionSet", "_Full")]
         [Trait("Type", "BuildAllPagesAndFeatures")]
         [Trait("Type", "BuildRandomNames")]
-        public async Task Build_All_ProjectNameValidation_G1_Uwp(string projectType, string framework, string platform, string language)
+        public async Task Build_All_ProjectNameValidation_G1_UwpAsync(string projectType, string framework, string platform, string language)
         {
-            Func<ITemplateInfo, bool> templateSelector =
-                t => t.GetTemplateType().IsItemTemplate()
+            bool templateSelector(ITemplateInfo t) => t.GetTemplateType().IsItemTemplate()
                 && (t.GetProjectTypeList().Contains(projectType) || t.GetProjectTypeList().Contains(All))
                 && (t.GetFrontEndFrameworkList().Contains(framework) || t.GetFrontEndFrameworkList().Contains(All))
                 && t.GetPlatform() == platform
@@ -54,21 +60,26 @@ namespace Microsoft.Templates.Test.Build.Uwp
 
             var projectName = $"{ShortProjectType(projectType)}{CharactersThatMayCauseProjectNameIssues()}G1{ShortLanguageName(language)}";
 
-            var projectPath = await AssertGenerateProjectAsync(projectName, projectType, framework, platform, language, templateSelector, BaseGenAndBuildFixture.GetRandomName);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework
+            };
 
-            AssertBuildProjectAsync(projectPath, projectName, platform);
+            var projectPath = await AssertGenerateProjectAsync(projectName, context, templateSelector, BaseGenAndBuildFixture.GetRandomName);
+
+            AssertBuildProject(projectPath, projectName, platform);
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), "MVVMBasic", "", Platforms.Uwp)]
+        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), Frameworks.MVVMBasic, "", Platforms.Uwp)]
         [Trait("ExecutionSet", "BuildMVVMBasic")]
         [Trait("ExecutionSet", "_Full")]
         [Trait("Type", "BuildAllPagesAndFeatures")]
         [Trait("Type", "BuildRandomNames")]
-        public async Task Build_All_ProjectNameValidation_G2_Uwp(string projectType, string framework, string platform, string language)
+        public async Task Build_All_ProjectNameValidation_G2_UwpAsync(string projectType, string framework, string platform, string language)
         {
-            Func<ITemplateInfo, bool> templateSelector =
-                t => t.GetTemplateType().IsItemTemplate()
+            bool templateSelector(ITemplateInfo t) => t.GetTemplateType().IsItemTemplate()
                 && (t.GetProjectTypeList().Contains(projectType) || t.GetProjectTypeList().Contains(All))
                 && (t.GetFrontEndFrameworkList().Contains(framework) || t.GetFrontEndFrameworkList().Contains(All))
                 && t.GetPlatform() == platform
@@ -78,22 +89,27 @@ namespace Microsoft.Templates.Test.Build.Uwp
 
             var projectName = $"{ShortProjectType(projectType)}{CharactersThatMayCauseProjectNameIssues()}G2{ShortLanguageName(language)}";
 
-            var projectPath = await AssertGenerateProjectAsync(projectName, projectType, framework, platform, language, templateSelector, BaseGenAndBuildFixture.GetRandomName);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework
+            };
 
-            AssertBuildProjectAsync(projectPath, projectName, platform);
+            var projectPath = await AssertGenerateProjectAsync(projectName, context, templateSelector, BaseGenAndBuildFixture.GetRandomName);
+
+            AssertBuildProject(projectPath, projectName, platform);
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), "MVVMBasic", ProgrammingLanguages.CSharp, Platforms.Uwp)]
+        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), Frameworks.MVVMBasic, ProgrammingLanguages.CSharp, Platforms.Uwp)]
         [Trait("ExecutionSet", "Minimum")]
         [Trait("ExecutionSet", "MinimumMVVMBasic")]
         [Trait("ExecutionSet", "_CIBuild")]
         [Trait("ExecutionSet", "_Full")]
         [Trait("Type", "CodeStyle")]
-        public async Task BuildAndTest_All_CheckWithStyleCop_G2_Uwp(string projectType, string framework, string platform, string language)
+        public async Task BuildAndTest_All_CheckWithStyleCop_G2_UwpAsync(string projectType, string framework, string platform, string language)
         {
-            Func<ITemplateInfo, bool> templateSelector =
-                t => t.GetTemplateType().IsItemTemplate()
+            bool templateSelector(ITemplateInfo t) => t.GetTemplateType().IsItemTemplate()
                 && (t.GetProjectTypeList().Contains(projectType) || t.GetProjectTypeList().Contains(All))
                 && (t.GetFrontEndFrameworkList().Contains(framework) || t.GetFrontEndFrameworkList().Contains(All))
                 && t.GetPlatform() == platform
@@ -103,21 +119,26 @@ namespace Microsoft.Templates.Test.Build.Uwp
 
             var projectName = $"{projectType}{framework}AllStyleCopG2";
 
-            var projectPath = await AssertGenerateProjectAsync(projectName, projectType, framework, platform, language, templateSelector, BaseGenAndBuildFixture.GetDefaultName);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework
+            };
 
-            AssertBuildProjectThenRunTestsAsync(projectPath, projectName, platform);
+            var projectPath = await AssertGenerateProjectAsync(projectName, context, templateSelector, BaseGenAndBuildFixture.GetDefaultName, true);
+
+            AssertBuildProjectThenRunTests(projectPath, projectName, platform);
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), "MVVMBasic", ProgrammingLanguages.CSharp, Platforms.Uwp)]
+        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), Frameworks.MVVMBasic, ProgrammingLanguages.CSharp, Platforms.Uwp)]
         [Trait("ExecutionSet", "Minimum")]
         [Trait("ExecutionSet", "BuildMVVMBasic")]
         [Trait("ExecutionSet", "_Full")]
         [Trait("Type", "CodeStyle")]
-        public async Task BuildAndTest_All_CheckWithStyleCop_G1_Uwp(string projectType, string framework, string platform, string language)
+        public async Task BuildAndTest_All_CheckWithStyleCop_G1_UwpAsync(string projectType, string framework, string platform, string language)
         {
-            Func<ITemplateInfo, bool> templateSelector =
-                t => t.GetTemplateType().IsItemTemplate()
+            bool templateSelector(ITemplateInfo t) => t.GetTemplateType().IsItemTemplate()
                 && (t.GetProjectTypeList().Contains(projectType) || t.GetProjectTypeList().Contains(All))
                 && (t.GetFrontEndFrameworkList().Contains(framework) || t.GetFrontEndFrameworkList().Contains(All))
                 && t.GetPlatform() == platform
@@ -127,49 +148,71 @@ namespace Microsoft.Templates.Test.Build.Uwp
 
             var projectName = $"{projectType}{framework}AllStyleCopG1";
 
-            var projectPath = await AssertGenerateProjectAsync(projectName, projectType, framework, platform, language, templateSelector, BaseGenAndBuildFixture.GetDefaultName);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework
+            };
 
-            AssertBuildProjectThenRunTestsAsync(projectPath, projectName, platform);
+            var projectPath = await AssertGenerateProjectAsync(projectName, context, templateSelector, BaseGenAndBuildFixture.GetDefaultName, false);
+
+            AssertBuildProjectThenRunTests(projectPath, projectName, platform);
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), "MVVMBasic", "", Platforms.Uwp)]
+        [MemberData(nameof(BaseGenAndBuildTests.GetProjectTemplatesForBuild), Frameworks.MVVMBasic, "", Platforms.Uwp)]
         [Trait("ExecutionSet", "BuildMVVMBasic")]
         [Trait("ExecutionSet", "_Full")]
         [Trait("Type", "BuildRightClick")]
-        public async Task Build_Empty_AddRightClick_Uwp(string projectType, string framework, string platform, string language)
+        public async Task Build_Empty_AddRightClick_UwpAsync(string projectType, string framework, string platform, string language)
         {
             var projectName = $"{ShortProjectType(projectType)}AllRC{ShortLanguageName(language)}";
 
-            var projectPath = await AssertGenerateRightClickAsync(projectName, projectType, framework, platform, language, true);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework
+            };
 
-            AssertBuildProjectAsync(projectPath, projectName, platform);
+            var projectPath = await AssertGenerateRightClickAsync(projectName, context, true);
+
+            AssertBuildProject(projectPath, projectName, platform);
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetPageAndFeatureTemplatesForBuild), "MVVMBasic", ProgrammingLanguages.CSharp, Platforms.Uwp, "")]
+        [MemberData(nameof(BaseGenAndBuildTests.GetPageAndFeatureTemplatesForBuild), Frameworks.MVVMBasic, ProgrammingLanguages.CSharp, Platforms.Uwp, "")]
         [Trait("ExecutionSet", "BuildOneByOneMVVMBasic")]
         [Trait("ExecutionSet", "_OneByOne")]
         [Trait("Type", "BuildOneByOneMVVMBasic")]
-        public async Task Build_MVVMBasic_CS_OneByOneItems_Uwp(string itemName, string projectType, string framework, string platform, string itemId, string language)
+        public async Task Build_MVVMBasic_CS_OneByOneItems_UwpAsync(string itemName, string projectType, string framework, string platform, string itemId, string language)
         {
-            var result = await AssertGenerationOneByOneAsync(itemName, projectType, framework, platform, itemId, language, false);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework
+            };
 
-            AssertBuildProjectAsync(result.ProjectPath, result.ProjecName, platform);
+            var (ProjectPath, ProjecName) = await AssertGenerationOneByOneAsync(itemName, context, itemId, false);
+
+            AssertBuildProject(ProjectPath, ProjecName, platform);
         }
 
         [Theory]
-        [MemberData(nameof(BaseGenAndBuildTests.GetPageAndFeatureTemplatesForBuild), "MVVMBasic", ProgrammingLanguages.VisualBasic, Platforms.Uwp, "")]
+        [MemberData(nameof(BaseGenAndBuildTests.GetPageAndFeatureTemplatesForBuild), Frameworks.MVVMBasic, ProgrammingLanguages.VisualBasic, Platforms.Uwp, "")]
         [Trait("ExecutionSet", "BuildOneByOneMVVMBasic")]
         [Trait("ExecutionSet", "_OneByOne")]
         [Trait("Type", "BuildOneByOneMVVMBasic")]
-        public async Task Build_MVVMBasic_VB_OneByOneItems_Uwp(string itemName, string projectType, string framework, string platform, string itemId, string language)
+        public async Task Build_MVVMBasic_VB_OneByOneItems_UwpAsync(string itemName, string projectType, string framework, string platform, string itemId, string language)
         {
-            var result = await AssertGenerationOneByOneAsync(itemName, projectType, framework, platform, itemId, language, false);
+            var context = new UserSelectionContext(language, platform)
+            {
+                ProjectType = projectType,
+                FrontEndFramework = framework
+            };
 
-            AssertBuildProjectAsync(result.ProjectPath, result.ProjecName, platform);
+            var (ProjectPath, ProjecName) = await AssertGenerationOneByOneAsync(itemName, context, itemId, false);
+
+            AssertBuildProject(ProjectPath, ProjecName, platform);
         }
-
- 
     }
 }
